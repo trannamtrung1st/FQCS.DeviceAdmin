@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.Business",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.ConsoleClient", "FQCS.DeviceAdmin.ConsoleClient\FQCS.DeviceAdmin.ConsoleClient.csproj", "{6D0E1B92-36CB-494A-89FB-E9B13A8B7584}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.WebApi", "FQCS.DeviceAdmin.WebApi\FQCS.DeviceAdmin.WebApi.csproj", "{F4D87476-70C0-43C4-89DE-4550C2E4E066}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{6D0E1B92-36CB-494A-89FB-E9B13A8B7584}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D0E1B92-36CB-494A-89FB-E9B13A8B7584}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D0E1B92-36CB-494A-89FB-E9B13A8B7584}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
