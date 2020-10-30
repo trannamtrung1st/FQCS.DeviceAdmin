@@ -1,0 +1,196 @@
+﻿@page
+@model FQCS.DeviceAdmin.WebAdmin.Pages.Identity.RegisterModel
+@{
+    Layout = null;
+    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@Model.Info.Title</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="/plugins/sweetalert2/sweetalert2.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+<body class="hold-transition register-page">
+    <div class="register-box">
+        <div class="register-logo">
+            <a href="@Constants.Routing.DASHBOARD"><b>@Business.Settings.Instance.Name</b> admin page</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body register-card-body">
+                <p class="login-box-msg">Register</p>
+
+                <form id="form-main" method="post">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" name="full_name" placeholder="Full name">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-info-circle"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" name="username" class="form-control" placeholder="Username">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" name="password" class="form-control" placeholder="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" name="confirm_password" class="form-control" placeholder="Confirm password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+
+                <div class="social-auth-links text-center">
+                    <p>- OR -</p>
+                    <a href="#" class="btn btn-block btn-primary">
+                        <i class="fab fa-facebook mr-2"></i>
+                        Sign up using Facebook
+                    </a>
+                    <a href="#" class="btn btn-block btn-danger">
+                        <i class="fab fa-google-plus mr-2"></i>
+                        Sign up using Google+
+                    </a>
+                </div>
+
+                <a href="Log in" class="text-center">Already have account?</a>
+            </div>
+            <!-- /.form-box -->
+        </div><!-- /.card -->
+    </div>
+    <!-- /.register-box -->
+    <partial name="AppLoadingModal" />
+
+    <!-- jQuery -->
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="/dist/js/adminlte.min.js"></script>
+    <partial name="AppScript" />
+    <script>
+        clearToken();
+        $(document).ready(() => {
+            $('#form-main').validate({
+                submitHandler: confirmSubmit,
+                rules: {
+                    username: {
+                        required: true,
+                        minlength: 5
+                    },
+                    password: {
+                        required: true,
+                    },
+                    confirm_password: {
+                        required: true,
+                        equalTo: "#form-main input[name=password]"
+                    }
+                },
+                messages: {
+                    username: {
+                        required: "Username required",
+                        minlength: "Username must be at least 6 characters"
+                    },
+                    password: {
+                        required: "Password required",
+                    },
+                    confirm_password: {
+                        required: "Confirm password required",
+                        equalTo: "Wrong confirm password"
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.input-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+
+        function confirmSubmit(form) {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitData(form);
+            });
+        }
+
+        function submitData() {
+            var form = $('#form-main')[0];
+            var formData = new FormData(form);
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.USER_API',
+                type: 'post',
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formData,
+                success: (respData) => {
+                    successAlert("Created successfully").then(() => {
+                        location.href = '@Constants.Routing.LOGIN';
+                    });
+                },
+                error: (resp) => {
+                    handleGeneralError(resp, null, (result) => {
+                        let html = '';
+                        if (isDuplicatedUsername(result))
+                            html += 'Username had already existed<br/>';
+                        return html;
+                    });
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

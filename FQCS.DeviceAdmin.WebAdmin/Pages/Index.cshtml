@@ -1,0 +1,17 @@
+﻿@page
+@model IndexModel
+@{
+    Layout = null;
+}
+
+<script>
+    saveTokenToLocalStorage();
+    function saveTokenToLocalStorage() {
+        localStorage.setItem('access_token', '@Model.TokenModel.access_token');
+        localStorage.setItem('refresh_token', '@Model.TokenModel.refresh_token');
+        localStorage.setItem('issued_utc', '@Model.TokenModel.issued_utc');
+        localStorage.setItem('expires_utc', '@Model.TokenModel.expires_utc');
+        localStorage.setItem('token_type', '@Model.TokenModel.token_type');
+        window.location.href = '@Model.ReturnUrl';
+    }
+</script>

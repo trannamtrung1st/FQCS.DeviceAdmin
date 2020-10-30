@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@2.2.0",
+      "destination": "wwwroot/plugins/jquery/dist"
+    },
+    //{
+    //  "library": "jquery-validate@1.14.0",
+    //  "destination": "wwwroot/plugins/jquery-validate"
+    //},
+    {
+      "library": "jquery-validation-unobtrusive@3.2.6",
+      "destination": "wwwroot/plugins/jquery-validation-unobtrusive"
+    },
+    {
+      "library": "jqueryui@1.12.1",
+      "destination": "wwwroot/plugins/jquery-ui"
+    }
+  ]
+}

@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.Data", "FQ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.Business", "FQCS.DeviceAdmin.Business\FQCS.DeviceAdmin.Business.csproj", "{E50884FB-636A-4E60-88B8-EEE497311B71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.ConsoleClient", "FQCS.DeviceAdmin.ConsoleClient\FQCS.DeviceAdmin.ConsoleClient.csproj", "{6D0E1B92-36CB-494A-89FB-E9B13A8B7584}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.ConsoleClient", "FQCS.DeviceAdmin.ConsoleClient\FQCS.DeviceAdmin.ConsoleClient.csproj", "{6D0E1B92-36CB-494A-89FB-E9B13A8B7584}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.WebApi", "FQCS.DeviceAdmin.WebApi\FQCS.DeviceAdmin.WebApi.csproj", "{F4D87476-70C0-43C4-89DE-4550C2E4E066}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.WebApi", "FQCS.DeviceAdmin.WebApi\FQCS.DeviceAdmin.WebApi.csproj", "{F4D87476-70C0-43C4-89DE-4550C2E4E066}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.WebAdmin", "FQCS.DeviceAdmin.WebAdmin\FQCS.DeviceAdmin.WebAdmin.csproj", "{33390372-2D39-4890-8846-7046261A9F93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4D87476-70C0-43C4-89DE-4550C2E4E066}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33390372-2D39-4890-8846-7046261A9F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33390372-2D39-4890-8846-7046261A9F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33390372-2D39-4890-8846-7046261A9F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33390372-2D39-4890-8846-7046261A9F93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

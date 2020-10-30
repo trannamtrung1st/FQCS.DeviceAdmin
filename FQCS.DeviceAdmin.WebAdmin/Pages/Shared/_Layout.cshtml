@@ -1,0 +1,183 @@
+﻿@model FQCS.DeviceAdmin.WebAdmin.Models.IInfoPageModel
+@inject Layout LayoutModel
+@{
+    string ActiveMenu(string menu)
+    {
+        return menu == Model.Info.Menu ? "active" : "";
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@Model.Info.Title</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="/plugins/sweetalert2/sweetalert2.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <style>
+        /*fix Swal issue*/
+        body {
+            padding-right: 0 !important;
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .dropdown-item-icon {
+            width: 30px;
+        }
+    </style>
+    @RenderSection("head", false)
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Model.Info.BackUrl"><i class="fas fa-arrow-left"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Constants.Routing.DASHBOARD"><i class="fas fa-home"></i></a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        Welcome <b>@User.FindFirst(Business.Constants.AppClaimType.UserName)?.Value</b>
+                        &nbsp;
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <a href="@Constants.Routing.IDENTITY" class="dropdown-item">
+                            <i class="fa fa-info-circle text-black-50 dropdown-item-icon"></i>
+                            Account information
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="@Constants.Routing.LOGOUT" class="dropdown-item">
+                            <i class="fa fa-door-open text-black-50 dropdown-item-icon"></i>
+                            Log out
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="/" class="brand-link">
+                <img src="/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                     style="opacity: .8">
+                <span class="brand-text font-weight-light">@Business.Settings.Instance.Name</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user panel (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    </div>
+                    <div class="info">
+                        <a href="#" class="d-block">
+                            Hi, <b>@User.FindFirst(Business.Constants.AppClaimType.UserName)?.Value</b>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+    with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="@Constants.Routing.DASHBOARD" class="nav-link @ActiveMenu(Constants.Menu.DASHBOARD)">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Dashboard
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-header">General</li>
+                        <li class="nav-item">
+                            <a href="@Constants.Routing.RESOURCE" class="nav-link @ActiveMenu(Constants.Menu.RESOURCE)">
+                                <i class="nav-icon fas fa-server"></i>
+                                <p>
+                                    Resource
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-header">Administration</li>
+                        <li class="nav-item">
+                            <a href="@Constants.Routing.ADMIN_ONLY" class="nav-link @ActiveMenu(Constants.Menu.ADMIN_ONLY)">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>
+                                    Admin only
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
+            All rights reserved.
+            <div class="float-right d-none d-sm-inline-block">
+                <b>Version</b> 3.0.4
+            </div>
+        </footer>
+    </div>
+    <!-- ./wrapper -->
+    <partial name="AppLoadingModal" />
+
+    <!-- jQuery -->
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- moment.js -->
+    <script src="/plugins/moment/moment.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="/dist/js/adminlte.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <partial name="AppScript" />
+    <script>
+        appInit();
+
+        layoutInit();
+        function layoutInit() {
+        }
+    </script>
+    @RenderSection("scripts", false)
+
+</body>
+</html>
