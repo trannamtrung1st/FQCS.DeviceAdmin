@@ -23,6 +23,7 @@ namespace FQCS.DeviceAdmin.Data.Models
         public virtual DbSet<Resource> Resource { get; set; }
         public virtual DbSet<QCEvent> QCEvent { get; set; }
         public virtual DbSet<DeviceConfig> DeviceConfig { get; set; }
+        public virtual DbSet<AppClient> AppClient { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -75,6 +76,19 @@ namespace FQCS.DeviceAdmin.Data.Models
                 entity.Property(e => e.KafkaUsername)
                     .HasMaxLength(255);
                 entity.Property(e => e.KafkaPassword)
+                    .HasMaxLength(2000);
+            });
+            modelBuilder.Entity<AppClient>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .IsUnicode(false)
+                    .HasMaxLength(100);
+                entity.Property(e => e.SecretKey)
+                    .IsUnicode(false)
+                    .HasMaxLength(100);
+                entity.Property(e => e.ClientName)
+                    .HasMaxLength(255);
+                entity.Property(e => e.Description)
                     .HasMaxLength(2000);
             });
         }
