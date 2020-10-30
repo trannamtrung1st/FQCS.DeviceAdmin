@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.WebApi", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.WebAdmin", "FQCS.DeviceAdmin.WebAdmin\FQCS.DeviceAdmin.WebAdmin.csproj", "{33390372-2D39-4890-8846-7046261A9F93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.Kafka", "FQCS.DeviceAdmin.Kafka\FQCS.DeviceAdmin.Kafka.csproj", "{DA5EAC01-99E4-4E24-8027-A1C713DDD343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.Kafka", "FQCS.DeviceAdmin.Kafka\FQCS.DeviceAdmin.Kafka.csproj", "{DA5EAC01-99E4-4E24-8027-A1C713DDD343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

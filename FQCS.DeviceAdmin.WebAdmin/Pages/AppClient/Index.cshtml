@@ -1,0 +1,193 @@
+﻿@page
+@model FQCS.DeviceAdmin.WebAdmin.Pages.AppClient.IndexModel
+@{
+    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
+}
+
+@section head {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Info.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Constants.Routing.DASHBOARD">Dashboard</a></li>
+                    <li class="breadcrumb-item active">@Model.Info.Title</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <a href="@Constants.Routing.APP_CLIENT_CREATE" class="btn btn-primary float-right">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <table id="tbl-main" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>No</th>
+                                <th>Id</th>
+                                <th class="sortable">Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>No</th>
+                                <th>Id</th>
+                                <th class="sortable">Name</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+@section scripts {
+
+    <!-- DataTables -->
+    <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- Select2 -->
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+    <!-- page script -->
+    <script>
+        let tblMain;
+        $(function () {
+            tblMain = $("#tbl-main").DataTable({
+                responsive: true,
+                autoWidth: false,
+                columnDefs: [
+                    { targets: [3], orderable: true, searchable: true },
+                    { targets: "_all", orderable: false, searchable: false },
+                ],
+                order: [[3, 'asc']]
+            });
+            tblMain._mustDrawNo = true;
+            tblMain.on('draw', onTableChange);
+            tblMain.on('length', onTableChange);
+            tblMain.on('page', onTableChange);
+            tblMain.on('search', onTableChange);
+            tblMain.on('order', onTableChange);
+            getData();
+            $('.select2').select2();
+        });
+
+        function onTableChange() {
+            if (tblMain._mustDrawNo) {
+                tblMain._mustDrawNo = false;
+                let no = 1;
+                tblMain.rows().every((r) => {
+                    const data = tblMain.row(r).data();
+                    data[1] = no++;
+                    tblMain.row(r).data(data);
+                });
+            } else tblMain._mustDrawNo = true;
+        }
+
+        function getData() {
+            changeLoading(true);
+            const data = {};
+            data.load_all = true;
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.APP_CLIENT_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    processData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data, '@Constants.Routing.APP_CLIENT');
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processData(data) {
+            tblMain.clear();
+            var btn = (id) =>
+                "<div class=\"dropdown\">" +
+                    "<button class=\"btn btn-primary dropdown-toggle btn-sm\"" +
+                        "type=\"button\" id=\"btn-dropdown\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                        "<i class=\"fa fa-list\"></i>" +
+                    "</button>" +
+                    "<div class=\"dropdown-menu\" aria-labelledby=\"btn-dropdown\">" +
+                        "<a class=\"dropdown-item\" href=\"" + "@Constants.Routing.APP_CLIENT_DETAIL".replace('{id}', id) + "\"><i class=\"fa fa-info-circle dropdown-item-icon\"></i>Detail</a>" +
+                        "<button class=\"dropdown-item\" onclick=\"confirmRemove('" + id + "')\"><i class=\"fa fa-trash dropdown-item-icon\"></i>Remove</button>" +
+                    "</div>" +
+                "</div>";
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                tblMain.row.add([
+                    btn(obj.id),
+                    null,
+                    obj.id,
+                    obj.client_name,
+                ]);
+            }
+            tblMain.draw();
+        }
+
+        function confirmRemove(id) {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitRemove(id);
+            });
+        }
+
+        function submitRemove(id) {
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.APP_CLIENT_API/' + id,
+                type: 'delete',
+                success: (data) => {
+                    successAlert("Deleted successfully").then(getData);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+    </script>
+}
+
