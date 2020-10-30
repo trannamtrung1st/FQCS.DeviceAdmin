@@ -115,7 +115,7 @@ namespace FQCS.DeviceAdmin.Business.Models
 
     public class AppClientQueryFilter
     {
-        public int? id { get; set; }
+        public string id { get; set; }
     }
 
     public class AppClientQueryPaging
