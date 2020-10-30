@@ -21,6 +21,8 @@ namespace FQCS.DeviceAdmin.Data.Models
         }
 
         public virtual DbSet<Resource> Resource { get; set; }
+        public virtual DbSet<QCEvent> QCEvent { get; set; }
+        public virtual DbSet<DeviceConfig> DeviceConfig { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -50,6 +52,30 @@ namespace FQCS.DeviceAdmin.Data.Models
             modelBuilder.Entity<Resource>(entity =>
             {
                 entity.Property(e => e.Name).HasMaxLength(255);
+            });
+            modelBuilder.Entity<QCEvent>(entity =>
+            {
+                entity.Property(e => e.DefectTypeCode)
+                    .IsUnicode(false)
+                    .HasMaxLength(100);
+                entity.Property(e => e.LeftImage)
+                    .IsUnicode(false)
+                    .HasMaxLength(2000);
+                entity.Property(e => e.RightImage)
+                    .IsUnicode(false)
+                    .HasMaxLength(2000);
+            });
+            modelBuilder.Entity<DeviceConfig>(entity =>
+            {
+                entity.Property(e => e.Identifier)
+                    .IsUnicode(false)
+                    .HasMaxLength(100);
+                entity.Property(e => e.KafkaServer)
+                    .HasMaxLength(255);
+                entity.Property(e => e.KafkaUsername)
+                    .HasMaxLength(255);
+                entity.Property(e => e.KafkaPassword)
+                    .HasMaxLength(2000);
             });
         }
     }

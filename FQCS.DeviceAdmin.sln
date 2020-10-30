@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.ConsoleCli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.WebApi", "FQCS.DeviceAdmin.WebApi\FQCS.DeviceAdmin.WebApi.csproj", "{F4D87476-70C0-43C4-89DE-4550C2E4E066}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.WebAdmin", "FQCS.DeviceAdmin.WebAdmin\FQCS.DeviceAdmin.WebAdmin.csproj", "{33390372-2D39-4890-8846-7046261A9F93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.WebAdmin", "FQCS.DeviceAdmin.WebAdmin\FQCS.DeviceAdmin.WebAdmin.csproj", "{33390372-2D39-4890-8846-7046261A9F93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.Kafka", "FQCS.DeviceAdmin.Kafka\FQCS.DeviceAdmin.Kafka.csproj", "{DA5EAC01-99E4-4E24-8027-A1C713DDD343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{33390372-2D39-4890-8846-7046261A9F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33390372-2D39-4890-8846-7046261A9F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33390372-2D39-4890-8846-7046261A9F93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA5EAC01-99E4-4E24-8027-A1C713DDD343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA5EAC01-99E4-4E24-8027-A1C713DDD343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA5EAC01-99E4-4E24-8027-A1C713DDD343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA5EAC01-99E4-4E24-8027-A1C713DDD343}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
