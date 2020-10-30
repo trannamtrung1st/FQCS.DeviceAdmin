@@ -10,5 +10,7 @@ namespace FQCS.DeviceAdmin.Data.Models
         public string SecretKey { get; set; }
         public string ClientName { get; set; }
         public string Description { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime LastUpdated { get; set; }
     }
 }

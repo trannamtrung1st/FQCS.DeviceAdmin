@@ -12,5 +12,8 @@ namespace FQCS.DeviceAdmin.Data.Models
         public string KafkaUsername { get; set; }
         // encrypted
         public string KafkaPassword { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime LastUpdated { get; set; }
+        public bool IsCurrent { get; set; }
     }
 }
