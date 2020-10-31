@@ -24,6 +24,8 @@ using FQCS.DeviceAdmin.Data.Models;
 using TNT.Core.Helpers.DI;
 using FQCS.DeviceAdmin.WebApi.Policies;
 using Microsoft.AspNetCore.Authorization;
+using FQCS.DeviceAdmin.Business.Services;
+using FQCS.DeviceAdmin.Business.Queries;
 
 namespace FQCS.DeviceAdmin.WebApi
 {
@@ -37,6 +39,7 @@ namespace FQCS.DeviceAdmin.WebApi
         }
 
         public IConfiguration Configuration { get; }
+        public static DeviceConfig CurrentConfig { get; set; }
         public static string WebRootPath { get; private set; }
         public static string MapPath(string path, string basePath = null)
         {
@@ -171,11 +174,14 @@ namespace FQCS.DeviceAdmin.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            DeviceConfigService configService)
         {
             PrepareEnvironment(env);
             WebRootPath = env.WebRootPath;
             Settings.Instance.WebRootPath = env.WebRootPath;
+            CurrentConfig = configService.DeviceConfigs.IsCurrent().FirstOrDefault();
+
             app.UseExceptionHandler($"/{Business.Constants.ApiEndpoint.ERROR}");
             app.UseStaticFiles();
             app.UseRouting();
