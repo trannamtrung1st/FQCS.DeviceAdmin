@@ -111,6 +111,7 @@ namespace FQCS.DeviceAdmin.WebAdmin
                 var authorizeFolders = new[] { "/" };
                 options.Conventions
                     .AddPageRoute("/AppClient/Detail", Constants.Routing.APP_CLIENT_DETAIL)
+                    .AddPageRoute("/DeviceConfig/Detail", Constants.Routing.DEVICE_CONFIG_DETAIL)
                     .AddPageRoute("/Resource/Detail", Constants.Routing.RESOURCE_DETAIL);
                 foreach (var f in authorizeFolders)
                     options.Conventions.AuthorizeFolder(f);
