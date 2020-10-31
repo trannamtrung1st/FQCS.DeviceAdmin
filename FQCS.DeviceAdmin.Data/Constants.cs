@@ -16,6 +16,7 @@ namespace FQCS.DeviceAdmin.Data
         public static class RoleName
         {
             public const string ADMIN = "Administrator";
+            public const string DEVICE = "Device";
         }
 
         public static class DefectTypeCode

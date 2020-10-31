@@ -49,6 +49,21 @@ namespace FQCS.DeviceAdmin.Data.Models
                 entity.Property(e => e.Id)
                     .IsUnicode(false)
                     .HasMaxLength(100);
+
+                // init data
+                entity.HasData(new AppRole
+                {
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.RoleName.ADMIN,
+                    NormalizedName = Constants.RoleName.ADMIN.ToUpper()
+                }, new AppRole
+                {
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.RoleName.DEVICE,
+                    NormalizedName = Constants.RoleName.DEVICE.ToUpper()
+                });
             });
             modelBuilder.Entity<Resource>(entity =>
             {
