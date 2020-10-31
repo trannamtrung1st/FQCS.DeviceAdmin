@@ -11,6 +11,9 @@ using TNT.Core.Helpers.DI;
 using System.IO;
 using FQCS.DeviceAdmin.Business.Helpers;
 using System.Globalization;
+using FQCS.DeviceAdmin.Kafka;
+using Confluent.Kafka;
+using Newtonsoft.Json;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
@@ -126,6 +129,35 @@ namespace FQCS.DeviceAdmin.Business.Services
         #region Create QCEvent
         protected void PrepareCreate(QCEvent entity)
         {
+            entity.LastUpdated = DateTime.UtcNow;
+        }
+
+        public void ProduceEventToKafkaServer(IProducer<Null, string> producer, QCEvent entity,
+            DeviceConfig currentConfig, string dataFolder)
+        {
+            var mess = new Message<Null, string>();
+            string leftImgB64 = null; string rightImgB64 = null;
+            var imgPath = Path.Combine(dataFolder, entity.LeftImage);
+            if (File.Exists(imgPath))
+            {
+                var img = File.ReadAllBytes(imgPath);
+                leftImgB64 = Convert.ToBase64String(img);
+            }
+            imgPath = Path.Combine(dataFolder, entity.RightImage);
+            if (File.Exists(imgPath))
+            {
+                var img = File.ReadAllBytes(imgPath);
+                rightImgB64 = Convert.ToBase64String(img);
+            }
+            mess.Value = JsonConvert.SerializeObject(new QCEventMessage
+            {
+                CreatedTime = entity.CreatedTime,
+                QCDefectCode = entity.DefectTypeCode,
+                Identifier = currentConfig.Identifier,
+                LeftB64Image = leftImgB64,
+                RightB64Image = rightImgB64,
+            });
+            producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess);
         }
 
         public QCEvent CreateQCEvent(CreateQCEventModel model)

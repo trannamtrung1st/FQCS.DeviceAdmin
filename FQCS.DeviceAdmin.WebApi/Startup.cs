@@ -26,6 +26,8 @@ using FQCS.DeviceAdmin.WebApi.Policies;
 using Microsoft.AspNetCore.Authorization;
 using FQCS.DeviceAdmin.Business.Services;
 using FQCS.DeviceAdmin.Business.Queries;
+using FQCS.DeviceAdmin.Kafka;
+using Confluent.Kafka;
 
 namespace FQCS.DeviceAdmin.WebApi
 {
@@ -40,6 +42,7 @@ namespace FQCS.DeviceAdmin.WebApi
 
         public IConfiguration Configuration { get; }
         public static DeviceConfig CurrentConfig { get; set; }
+        public static IProducer<Null, string> KafkaProducer { get; set; }
         public static string WebRootPath { get; private set; }
         public static string MapPath(string path, string basePath = null)
         {
@@ -188,7 +191,9 @@ namespace FQCS.DeviceAdmin.WebApi
             PrepareEnvironment(env);
             WebRootPath = env.WebRootPath;
             Settings.Instance.WebRootPath = env.WebRootPath;
-            CurrentConfig = configService.DeviceConfigs.IsCurrent().FirstOrDefault();
+            var config = configService.DeviceConfigs.IsCurrent().FirstOrDefault();
+            if (config != null)
+                SetCurrentConfig(config);
 
             app.UseExceptionHandler($"/{Business.Constants.ApiEndpoint.ERROR}");
             app.UseStaticFiles();
@@ -227,6 +232,26 @@ namespace FQCS.DeviceAdmin.WebApi
             var uploadPath = Settings.Instance.UploadFolderPath;
             uploadPath = Path.Combine(env.WebRootPath, uploadPath);
             Directory.CreateDirectory(uploadPath);
+            Directory.CreateDirectory(Settings.Instance.QCEventImageFolderPath);
+        }
+
+        public static void SetCurrentConfig(DeviceConfig config)
+        {
+            CurrentConfig = config;
+            try
+            {
+                if (CurrentConfig != null && !string.IsNullOrWhiteSpace(CurrentConfig.KafkaServer))
+                    KafkaProducer = KafkaHelper.GetPlainProducer(CurrentConfig.KafkaServer,
+                        CurrentConfig.KafkaUsername, CurrentConfig.KafkaPassword);
+                else
+                {
+                    var oldProducer = KafkaProducer;
+                    KafkaProducer = null;
+                    if (oldProducer != null)
+                        oldProducer.Dispose();
+                }
+            }
+            catch (Exception) { }
         }
     }
 }

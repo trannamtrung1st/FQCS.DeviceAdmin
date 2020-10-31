@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FQCS.DeviceAdmin.Data\FQCS.DeviceAdmin.Data.csproj" />
+    <ProjectReference Include="..\FQCS.DeviceAdmin.Kafka\FQCS.DeviceAdmin.Kafka.csproj" />
     <ProjectReference Include="..\FQCS.DeviceAdmin\FQCS.DeviceAdmin.csproj" />
   </ItemGroup>
 

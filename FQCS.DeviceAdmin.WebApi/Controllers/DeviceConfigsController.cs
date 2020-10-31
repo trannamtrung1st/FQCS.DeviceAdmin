@@ -70,6 +70,8 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 return BadRequest(AppResult.FailValidation(data: validationData));
             _service.UpdateDeviceConfig(entity, model);
             context.SaveChanges();
+            if (entity.IsCurrent)
+                Startup.SetCurrentConfig(entity);
             return NoContent();
         }
 
@@ -86,6 +88,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             var oldCurrent = _service.DeviceConfigs.IsCurrent().FirstOrDefault();
             _service.ChangeCurrentDeviceConfig(entity, oldCurrent);
             context.SaveChanges();
+            Startup.SetCurrentConfig(entity);
             return NoContent();
         }
 
@@ -104,7 +107,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 _service.DeleteDeviceConfig(entity);
                 context.SaveChanges();
                 if (entity.IsCurrent)
-                    Startup.CurrentConfig = null;
+                    Startup.SetCurrentConfig(null);
                 return NoContent();
             }
             catch (DbUpdateException e)
