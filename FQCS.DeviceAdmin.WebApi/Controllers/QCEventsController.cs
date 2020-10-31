@@ -52,7 +52,6 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(result));
         }
 
-
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
         [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
         [HttpGet("images")]
@@ -72,6 +71,20 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 _fileService.DeleteFile(tempPath, "");
                 throw e;
             }
+        }
+
+        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [HttpPost("clear")]
+        public async Task<IActionResult> ClearAllEvents()
+        {
+            var validationData = _service.ValidateClearAllEvents(User);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var task = _service.ClearAllQCEvents();
+            _service.ClearAllQCEventImages(Settings.Instance.QCEventImageFolderPath);
+            var deleted = await task;
+            return Ok(AppResult.Success(deleted));
         }
 
         [Authorize]

@@ -14,11 +14,15 @@ using System.Globalization;
 using FQCS.DeviceAdmin.Kafka;
 using Confluent.Kafka;
 using Newtonsoft.Json;
+using EFCore.BulkExtensions;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
     public class QCEventService : Service
     {
+        [Inject]
+        protected readonly FileService fileService;
+
         public QCEventService(ServiceInjection inj) : base(inj)
         {
         }
@@ -174,6 +178,17 @@ namespace FQCS.DeviceAdmin.Business.Services
         #endregion
 
         #region Delete QCEvent
+        public async Task<int> ClearAllQCEvents()
+        {
+            return await context.QCEvent.BatchDeleteAsync();
+        }
+
+        public void ClearAllQCEventImages(string dataFolder)
+        {
+            fileService.DeleteDirectory(dataFolder, "");
+            Directory.CreateDirectory(dataFolder);
+        }
+
         public QCEvent DeleteQCEvent(QCEvent entity)
         {
             return context.QCEvent.Remove(entity).Entity;
@@ -181,6 +196,12 @@ namespace FQCS.DeviceAdmin.Business.Services
         #endregion
 
         #region Validation
+        public ValidationData ValidateClearAllEvents(
+            ClaimsPrincipal principal)
+        {
+            return new ValidationData();
+        }
+
         public ValidationData ValidateGetAllImages(
             ClaimsPrincipal principal)
         {
