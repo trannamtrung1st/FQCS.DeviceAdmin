@@ -54,6 +54,12 @@ namespace FQCS.DeviceAdmin.Business
             public const string FullName = "full_name";
         }
 
+        public static class Authorization
+        {
+            public const char APP_CLIENT_INFO_SPLIT = '!';
+            public const string CLIENT_AUTH_SCHEME = "AppClient";
+        }
+
         public static class AppOAuthScope
         {
             public const string ROLES = "roles";

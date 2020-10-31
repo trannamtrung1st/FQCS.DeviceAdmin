@@ -22,6 +22,8 @@ using FQCS.DeviceAdmin.Business.Helpers;
 using FQCS.DeviceAdmin.Data;
 using FQCS.DeviceAdmin.Data.Models;
 using TNT.Core.Helpers.DI;
+using FQCS.DeviceAdmin.WebApi.Policies;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FQCS.DeviceAdmin.WebApi
 {
@@ -122,6 +124,12 @@ namespace FQCS.DeviceAdmin.WebApi
                     //    }
                     //};
                 });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Constants.Policy.APP_CLIENT, policy =>
+                    policy.Requirements.Add(new AppClientRequirement()));
+            });
+            services.AddScoped<IAuthorizationHandler, AppClientAuthHandler>();
             #endregion
             services.AddSingleton(new DefaultDateTimeModelBinder());
             services.AddControllers(options =>

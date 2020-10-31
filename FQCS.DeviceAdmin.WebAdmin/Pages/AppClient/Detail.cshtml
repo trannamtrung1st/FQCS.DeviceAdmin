@@ -52,7 +52,16 @@
                             </div>
                             <div class="form-group">
                                 <label>Client Secret</label>
-                                <input type="password" name="secret_key" class="form-control" placeholder="Please enter client secret">
+                                <div class="row">
+                                    <div class="col-9">
+                                        <input type="password" name="secret_key" class="form-control" placeholder="Please enter client secret">
+                                    </div>
+                                    <div class="col-3">
+                                        <button type="button" class="btn btn-default" onclick="copySecret()">
+                                            <i class="fa fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Client name</label>
@@ -117,6 +126,20 @@
                 }
             });
         });
+
+        function copySecret() {
+            let el = $('<input name="secret_key_copy"/>');
+            const secret = $('#form-main [name=secret_key]').val();
+            el.val(secret);
+            el.attr('readonly', '');
+            el.css('position', 'absolute');
+            el.css('left', '-9999px');
+            $('body').append(el);
+            el = el[0];
+            el.select();
+            document.execCommand('copy');
+            $(el).remove();
+        }
 
         function getData() {
             changeLoading(true);

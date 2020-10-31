@@ -10,6 +10,7 @@ namespace FQCS.DeviceAdmin.Business
     public class Settings
     {
         public string Name { get; set; }
+        public int RequestMinsDiffAllowed { get; set; }
 
         private static Settings _instance;
         public static Settings Instance

@@ -24,6 +24,8 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     {
         [Inject]
         private readonly AppClientService _service;
+        [Inject]
+        private readonly IdentityService _identityService;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize]
@@ -44,6 +46,28 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 return NotFound(AppResult.NotFound());
             return Ok(AppResult.Success(result));
         }
+
+#if !RELEASE
+        [HttpGet("test-client-info")]
+        public IActionResult GetTestClientInfo(string clientId)
+        {
+            var client = _service.AppClients.Id(clientId).First();
+            var now = DateTime.UtcNow;
+            var df = "ddMMyyyyhhmmss";
+            var dtStr = now.ToString(df);
+            var hashed = _identityService.ComputeHash(dtStr, df, client.SecretKey);
+            return Ok(AppResult.Success($"AppClient {clientId}!{dtStr}!{df}!{hashed}"));
+        }
+
+        [Authorize(Policy = Constants.Policy.APP_CLIENT)]
+        [HttpGet("secret")]
+        public IActionResult GetSecret()
+        {
+            var clientId = HttpContext.Items[Constants.RequestItemKey.CLIENT_ID] as string;
+            var secret = _service.AppClients.Id(clientId).First().SecretKey;
+            return Ok(AppResult.Success(secret));
+        }
+#endif
 
         [Authorize]
         [HttpPost("")]

@@ -32,6 +32,20 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
         }
 
+        #region App client
+        public string[] ExtractInfoFromClientAuthHeader(string authHeader)
+        {
+            if (IsValidAppClientScheme(authHeader))
+                return authHeader.Split(' ')[1]
+                    .Split(Constants.Authorization.APP_CLIENT_INFO_SPLIT);
+            throw new Exception("Invalid scheme");
+        }
+        public string ComputeHash(string dateTimeStr, string dateFormat, string secret)
+        {
+            return CryptoHelper.HMACSHA256(dateTimeStr + dateFormat, secret);
+        }
+        #endregion
+
         #region Query AppUser
         public IQueryable<AppUser> Users
         {
@@ -482,6 +496,26 @@ namespace FQCS.DeviceAdmin.Business.Services
         #endregion
 
         #region Validation
+        public bool IsValidAppClientScheme(string authHeader)
+        {
+            return authHeader.StartsWith(Constants.Authorization.CLIENT_AUTH_SCHEME + " ");
+        }
+
+        public ValidationData ValidateClientRequest(string dateTimeStr, string dateFormat,
+            string hashed, AppClient client)
+        {
+            var validationData = new ValidationData();
+            DateTime dateTime;
+            if (!dateTimeStr.TryConvertToDateTime(dateFormat, out dateTime))
+                return validationData.Fail(mess: "Wrong date format", code: Constants.AppResultCode.FailValidation);
+            if (Math.Abs(DateTime.UtcNow.Subtract(dateTime).TotalMinutes) >= Settings.Instance.RequestMinsDiffAllowed)
+                return validationData.Fail(mess: "Invalid request time", code: Constants.AppResultCode.FailValidation);
+            var serverHashed = ComputeHash(dateTimeStr, dateFormat, client.SecretKey);
+            if (serverHashed != hashed)
+                return validationData.Fail(mess: "Invalid hashed", code: Constants.AppResultCode.FailValidation);
+            return validationData;
+        }
+
         public ValidationData ValidateGetAppUsers(
             ClaimsPrincipal principal,
             AppUserQueryFilter filter,
