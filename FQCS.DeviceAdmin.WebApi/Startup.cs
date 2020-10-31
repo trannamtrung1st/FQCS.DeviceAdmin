@@ -129,10 +129,18 @@ namespace FQCS.DeviceAdmin.WebApi
                 });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Constants.Policy.APP_CLIENT, policy =>
-                    policy.Requirements.Add(new AppClientRequirement()));
+                options.AddPolicy(Constants.Policy.And.APP_CLIENT, policy =>
+                    policy.Requirements.Add(new AppClientRequirement(isOR: false)));
+                options.AddPolicy(Constants.Policy.Or.APP_CLIENT, policy =>
+                    policy.Requirements.Add(new AppClientRequirement(isOR: true)));
+
+                options.AddPolicy(Constants.Policy.And.AUTH_USER, policy =>
+                    policy.Requirements.Add(new AuthUserRequirement(isOR: false)));
+                options.AddPolicy(Constants.Policy.Or.AUTH_USER, policy =>
+                    policy.Requirements.Add(new AuthUserRequirement(isOR: true)));
             });
             services.AddScoped<IAuthorizationHandler, AppClientAuthHandler>();
+            services.AddScoped<IAuthorizationHandler, AuthUserAuthHandler>();
             #endregion
             services.AddSingleton(new DefaultDateTimeModelBinder());
             services.AddControllers(options =>

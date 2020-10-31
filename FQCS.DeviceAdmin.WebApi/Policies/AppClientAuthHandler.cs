@@ -45,13 +45,13 @@ namespace FQCS.DeviceAdmin.WebApi.Policies
                         {
                             httpContext.Items[Constants.RequestItemKey.CLIENT_ID] = appClient.Id;
                             context.Succeed(requirement);
+                            SucceedORRequirement(context);
                             return Task.CompletedTask;
                         }
                     }
                 }
                 catch (Exception) { }
             }
-            context.Fail();
             return Task.CompletedTask;
         }
     }

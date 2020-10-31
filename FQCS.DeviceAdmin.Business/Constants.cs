@@ -70,6 +70,7 @@ namespace FQCS.DeviceAdmin.Business
             public const string ROLE_API = "api/roles";
             public const string USER_API = "api/users";
             public const string RESOURCE_API = "api/resources";
+            public const string QC_EVENT_API = "api/qc-events";
             public const string APP_CLIENT_API = "api/app-clients";
             public const string DEVICE_CONFIG_API = "api/device-configs";
             public const string ERROR = "error";

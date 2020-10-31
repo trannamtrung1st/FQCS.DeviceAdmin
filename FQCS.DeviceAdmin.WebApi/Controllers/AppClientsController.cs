@@ -53,13 +53,13 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         {
             var client = _service.AppClients.Id(clientId).First();
             var now = DateTime.UtcNow;
-            var df = "ddMMyyyyhhmmss";
+            var df = "ddMMyyyyHHmmss";
             var dtStr = now.ToString(df);
             var hashed = _identityService.ComputeHash(dtStr, df, client.SecretKey);
             return Ok(AppResult.Success($"AppClient {clientId}!{dtStr}!{df}!{hashed}"));
         }
 
-        [Authorize(Policy = Constants.Policy.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.And.APP_CLIENT)]
         [HttpGet("secret")]
         public IActionResult GetSecret()
         {

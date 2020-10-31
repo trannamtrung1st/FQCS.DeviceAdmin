@@ -13,5 +13,18 @@ namespace FQCS.DeviceAdmin.WebApi.Policies
         {
             inj.Inject(this);
         }
+
+        protected void SucceedORRequirement(AuthorizationHandlerContext context)
+        {
+            foreach (var req in context.PendingRequirements.ToList())
+            {
+                if (req is LogicRequirement)
+                {
+                    var logReq = req as LogicRequirement;
+                    if (logReq.IsOR)
+                        context.Succeed(logReq);
+                }
+            }
+        }
     }
 }

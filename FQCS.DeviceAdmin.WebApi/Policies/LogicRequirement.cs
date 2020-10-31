@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace FQCS.DeviceAdmin.WebApi.Policies
 {
-    public class AppClientRequirement : LogicRequirement
+    public abstract class LogicRequirement : IAuthorizationRequirement
     {
-        public AppClientRequirement(bool isOR = false) : base(isOR)
+        public bool IsOR { get; set; }
+        public LogicRequirement(bool isOR = false)
         {
+            IsOR = isOR;
         }
     }
 }

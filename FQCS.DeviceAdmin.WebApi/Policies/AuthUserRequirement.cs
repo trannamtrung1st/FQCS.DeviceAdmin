@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FQCS.DeviceAdmin.WebApi.Policies
 {
-    public class AppClientRequirement : LogicRequirement
+    public class AuthUserRequirement : LogicRequirement
     {
-        public AppClientRequirement(bool isOR = false) : base(isOR)
+        public AuthUserRequirement(bool isOR = false) : base(isOR)
         {
         }
     }

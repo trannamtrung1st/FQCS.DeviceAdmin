@@ -508,7 +508,8 @@ namespace FQCS.DeviceAdmin.Business.Services
             DateTime dateTime;
             if (!dateTimeStr.TryConvertToDateTime(dateFormat, out dateTime))
                 return validationData.Fail(mess: "Wrong date format", code: Constants.AppResultCode.FailValidation);
-            if (Math.Abs(DateTime.UtcNow.Subtract(dateTime).TotalMinutes) >= Settings.Instance.RequestMinsDiffAllowed)
+            var diffMins = Math.Abs(DateTime.UtcNow.Subtract(dateTime).TotalMinutes);
+            if (diffMins >= Settings.Instance.RequestMinsDiffAllowed)
                 return validationData.Fail(mess: "Invalid request time", code: Constants.AppResultCode.FailValidation);
             var serverHashed = ComputeHash(dateTimeStr, dateFormat, client.SecretKey);
             if (serverHashed != hashed)

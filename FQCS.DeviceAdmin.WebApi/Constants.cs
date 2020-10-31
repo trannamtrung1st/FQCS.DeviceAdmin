@@ -9,7 +9,16 @@ namespace FQCS.DeviceAdmin.WebApi
     {
         public static class Policy
         {
-            public const string APP_CLIENT = "AppClient";
+            public static class And
+            {
+                public const string APP_CLIENT = "And.AppClient";
+                public const string AUTH_USER = "And.AuthUser";
+            }
+            public static class Or
+            {
+                public const string APP_CLIENT = "Or.AppClient";
+                public const string AUTH_USER = "Or.AuthUser";
+            }
         }
 
         public static class RequestItemKey
