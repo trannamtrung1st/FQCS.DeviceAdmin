@@ -14,6 +14,10 @@ using FQCS.DeviceAdmin.Business;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using FQCS.DeviceAdmin.Business.Helpers;
+using System.IO.Compression;
+using System.IO;
+using elFinder.NetCore.Models;
+using System.Net.Mime;
 
 namespace FQCS.DeviceAdmin.WebApi.Controllers
 {
@@ -24,6 +28,8 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     {
         [Inject]
         private readonly QCEventService _service;
+        [Inject]
+        private readonly FileService _fileService;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
@@ -44,6 +50,28 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             if (options.single_only && result == null)
                 return NotFound(AppResult.NotFound());
             return Ok(AppResult.Success(result));
+        }
+
+
+        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [HttpGet("images")]
+        public IActionResult GetAllImages()
+        {
+            var validationData = _service.ValidateGetAllImages(User);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var tempPath = _fileService.GetLocalTempFilePath(ext: ".zip");
+            try
+            {
+                _fileService.ZipFolderToDir(Settings.Instance.QCEventImageFolderPath, tempPath);
+                return PhysicalFile(tempPath, MediaTypeNames.Application.Zip, "images.zip");
+            }
+            catch (Exception e)
+            {
+                _fileService.DeleteFile(tempPath, "");
+                throw e;
+            }
         }
 
         [Authorize]

@@ -181,6 +181,12 @@ namespace FQCS.DeviceAdmin.Business.Services
         #endregion
 
         #region Validation
+        public ValidationData ValidateGetAllImages(
+            ClaimsPrincipal principal)
+        {
+            return new ValidationData();
+        }
+
         public ValidationData ValidateGetQCEvents(
             ClaimsPrincipal principal,
             QCEventQueryFilter filter,

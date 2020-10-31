@@ -12,6 +12,7 @@ using FQCS.DeviceAdmin.Business.Helpers;
 using static FQCS.DeviceAdmin.Business.Constants;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.IO.Compression;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
@@ -19,6 +20,19 @@ namespace FQCS.DeviceAdmin.Business.Services
     {
         public FileService(ServiceInjection inj) : base(inj)
         {
+        }
+
+        public void ZipFolderToDir(string folderPath, string destPath)
+        {
+            ZipFile.CreateFromDirectory(folderPath, destPath);
+        }
+
+        public string GetLocalTempFilePath(string ext = null)
+        {
+            if (ext != null && !ext.Contains("."))
+                ext = "." + ext;
+            var tempPath = GetFilePath(Path.GetTempPath(), null, Path.GetTempFileName() + ext ?? "");
+            return tempPath.Item2;
         }
 
         public async Task SaveFile(byte[] file, string fullPath)
