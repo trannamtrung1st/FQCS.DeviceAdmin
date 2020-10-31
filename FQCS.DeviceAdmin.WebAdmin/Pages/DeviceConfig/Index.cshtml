@@ -171,6 +171,7 @@
                     "<div class=\"dropdown-menu\" aria-labelledby=\"btn-dropdown\">" +
                         "<a class=\"dropdown-item\" href=\"" + "@Constants.Routing.DEVICE_CONFIG_DETAIL".replace('{id}', id) + "\"><i class=\"fa fa-info-circle dropdown-item-icon\"></i>Detail</a>" +
                         "<button class=\"dropdown-item\" onclick=\"confirmRemove(" + id + ")\"><i class=\"fa fa-trash dropdown-item-icon\"></i>Remove</button>" +
+                        "<button class=\"dropdown-item\" onclick=\"confirmChangeCurrent(" + id + ")\"><i class=\"fa fa-toggle-on dropdown-item-icon\"></i>Set current</button>" +
                     "</div>" +
                 "</div>";
             for (var i = 0; i < data.length; i++) {
@@ -201,6 +202,34 @@
                 type: 'delete',
                 success: (data) => {
                     successAlert("Deleted successfully").then(getData);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function confirmChangeCurrent(id) {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitChangeCurrent(id);
+            });
+        }
+
+        function submitChangeCurrent(id) {
+            let data = {};
+            data.config_id = id;
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.DEVICE_CONFIG_API/current',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => {
+                    successAlert("Updated successfully").then(getData);
                 },
                 error: (data) => {
                     handleGeneralError(data);
