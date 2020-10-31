@@ -1,0 +1,152 @@
+﻿@page
+@model FQCS.DeviceAdmin.WebAdmin.Pages.DeviceConfig.CreateModel
+@{
+    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
+}
+
+@section head {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Info.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Constants.Routing.DASHBOARD">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="@Constants.Routing.DEVICE_CONFIG">Device config</a></li>
+                    <li class="breadcrumb-item active">@Model.Info.Title</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- jquery validation -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fa fa-info-circle mr-1"></i>
+                            Info
+                        </h3>
+                    </div>
+                    <!-- form start -->
+                    <form role="form" id="form-main">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Identifier</label>
+                                <input type="text" name="identifier" class="form-control" placeholder="Please enter identifier">
+                            </div>
+                            <div class="form-group">
+                                <label>Kafka server</label>
+                                <input type="text" name="kafka_server" class="form-control" placeholder="Please enter Kafka server">
+                            </div>
+                            <div class="form-group">
+                                <label>Kafka username</label>
+                                <input type="text" name="kafka_username" class="form-control" placeholder="Please enter Kafka username">
+                            </div>
+                            <div class="form-group">
+                                <label>Kafka password</label>
+                                <input type="password" name="kafka_password" class="form-control" placeholder="Please enter Kafka password">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-check mr-1"></i>
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!--/.col (left) -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+@section scripts {
+
+    <!-- jquery-validation -->
+    <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
+    <!-- Select2 -->
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('#form-main').validate({
+                submitHandler: confirmSubmit,
+                rules: {
+                    identifier: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    identifier: {
+                        required: "Identifier required",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+
+        function confirmSubmit() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitData();
+            });
+        }
+
+        function submitData() {
+            const model = {};
+            model.identifier = $('[name=identifier]').val();
+            model.kafka_server = $('[name=kafka_server]').val();
+            model.kafka_username = $('[name=kafka_username]').val();
+            model.kafka_password = $('[name=kafka_password]').val();
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.DEVICE_CONFIG_API',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (respData) => {
+                    successAlert("Created successfully").then(() => {
+                        location.href = '@Constants.Routing.DEVICE_CONFIG';
+                    });
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+    </script>
+}
