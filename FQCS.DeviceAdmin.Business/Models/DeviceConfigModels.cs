@@ -45,8 +45,8 @@ namespace FQCS.DeviceAdmin.Business.Models
         [JsonProperty("kafka_username")]
         public string KafkaUsername { get; set; }
         // encrypted
-        [JsonProperty("kafka_password")]
-        public string KafkaPassword { get; set; }
+        [JsonProperty("kafka_password_reset")]
+        public string KafkaPasswordReset { get; set; }
 
     }
 

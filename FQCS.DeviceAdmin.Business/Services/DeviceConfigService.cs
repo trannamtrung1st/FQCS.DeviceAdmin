@@ -158,6 +158,8 @@ namespace FQCS.DeviceAdmin.Business.Services
         public void UpdateDeviceConfig(DeviceConfig entity, UpdateDeviceConfigModel model)
         {
             model.CopyTo(entity);
+            if (model.KafkaPasswordReset != null)
+                entity.KafkaPassword = model.KafkaPasswordReset;
             PrepareUpdate(entity);
         }
         #endregion
