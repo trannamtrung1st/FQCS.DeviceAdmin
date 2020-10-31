@@ -19,8 +19,10 @@ namespace FQCS.DeviceAdmin.Business.Models
 
         [JsonProperty("defect_type_code")]
         public string DefectTypeCode { get; set; }
-        [JsonProperty("created_time")]
-        public DateTime CreatedTime { get; set; }
+        [JsonProperty("created_time_str")]
+        public string CreatedTimeStr { get; set; }
+        [JsonProperty("date_format")]
+        public string DateFormat { get; set; }
         [JsonProperty("left_image")]
         public string LeftImage { get; set; }
         [JsonProperty("right_image")]

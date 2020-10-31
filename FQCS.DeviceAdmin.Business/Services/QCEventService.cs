@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 using System.IO;
 using FQCS.DeviceAdmin.Business.Helpers;
+using System.Globalization;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
@@ -130,6 +131,8 @@ namespace FQCS.DeviceAdmin.Business.Services
         public QCEvent CreateQCEvent(CreateQCEventModel model)
         {
             var entity = model.ToDest();
+            entity.CreatedTime = DateTime.ParseExact(
+                model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture);
             PrepareCreate(entity);
             return context.QCEvent.Add(entity).Entity;
         }
