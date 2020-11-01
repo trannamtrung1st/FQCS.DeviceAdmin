@@ -137,7 +137,7 @@ namespace FQCS.DeviceAdmin.Business.Services
         }
 
         public void ProduceEventToKafkaServer(IProducer<Null, string> producer, QCEvent entity,
-            DeviceConfig currentConfig, string dataFolder)
+            DeviceConfig currentConfig, string dataFolder, string connStr)
         {
             var mess = new Message<Null, string>();
             string leftImgB64 = null; string rightImgB64 = null;
@@ -161,7 +161,16 @@ namespace FQCS.DeviceAdmin.Business.Services
                 LeftB64Image = leftImgB64,
                 RightB64Image = rightImgB64,
             });
-            producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess);
+            producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess, report =>
+            {
+                if (report.Status == PersistenceStatus.Persisted)
+                {
+                    using var context = new DataContext(
+                        new DbContextOptionsBuilder<DataContext>().UseSqlServer(connStr).Options);
+                    context.QCEvent.Id(entity.Id).First().NotiSent = true;
+                    context.SaveChanges();
+                }
+            });
         }
 
         public QCEvent CreateQCEvent(CreateQCEventModel model)

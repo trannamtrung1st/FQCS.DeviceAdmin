@@ -13,5 +13,6 @@ namespace FQCS.DeviceAdmin.Data.Models
         public DateTime CreatedTime { get; set; }
         public string LeftImage { get; set; }
         public string RightImage { get; set; }
+        public bool NotiSent { get; set; }
     }
 }

@@ -41,8 +41,9 @@ namespace FQCS.DeviceAdmin.WebApi
         }
 
         public IConfiguration Configuration { get; }
-        public static DeviceConfig CurrentConfig { get; set; }
-        public static IProducer<Null, string> KafkaProducer { get; set; }
+        public static DeviceConfig CurrentConfig { get; private set; }
+        public static string ConnStr { get; private set; }
+        public static IProducer<Null, string> KafkaProducer { get; private set; }
         public static string WebRootPath { get; private set; }
         public static string MapPath(string path, string basePath = null)
         {
@@ -63,14 +64,15 @@ namespace FQCS.DeviceAdmin.WebApi
                 Assembly.GetExecutingAssembly()
             });
             services.AddServiceInjection();
-            var connStr = Configuration.GetConnectionString("DataContext");
+            ConnStr = Configuration.GetConnectionString("DataContext");
 #if TEST
-            connStr = connStr.Replace("{envConfig}", ".Test");
+            ConnStr = ConnStr.Replace("{envConfig}", ".Test");
 #else
-            connStr = connStr.Replace("{envConfig}", "");
+            ConnStr = ConnStr.Replace("{envConfig}", "");
 #endif
+
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(connStr).UseLazyLoadingProxies());
+                options.UseSqlServer(ConnStr).UseLazyLoadingProxies());
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
