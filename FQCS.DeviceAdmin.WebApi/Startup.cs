@@ -256,6 +256,7 @@ namespace FQCS.DeviceAdmin.WebApi
         {
             var oldConfig = CurrentConfig;
             CurrentConfig = config;
+            QCEvent.CheckedEvents.Clear();
             try
             {
                 if (CurrentConfig != null && !string.IsNullOrWhiteSpace(CurrentConfig.KafkaServer))
