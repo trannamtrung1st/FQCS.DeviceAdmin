@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FQCS.DeviceAdmin.Business\FQCS.DeviceAdmin.Business.csproj" />
+    <ProjectReference Include="..\FQCS.DeviceAdmin.Scheduler\FQCS.DeviceAdmin.Scheduler.csproj" />
     <ProjectReference Include="..\FQCS.DeviceAdmin\FQCS.DeviceAdmin.csproj" />
   </ItemGroup>
 

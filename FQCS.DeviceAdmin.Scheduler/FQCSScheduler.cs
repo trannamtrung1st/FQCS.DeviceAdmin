@@ -65,6 +65,7 @@ namespace FQCS.DeviceAdmin.Scheduler
 
         public async Task<DateTimeOffset?> ScheduleSendUnsentEventsJob(DateTime? startAt)
         {
+            ValidateSendUnsentJobSchedule();
             TriggerBuilder builder = TriggerBuilder.Create()
                 .WithIdentity(SendUnsentEventsJobTriggerKey);
             if (startAt != null)
@@ -84,6 +85,7 @@ namespace FQCS.DeviceAdmin.Scheduler
 
         public async Task<DateTimeOffset?> ScheduleRemoveOldEventsJob(int intervalSecs, DateTime? startAt)
         {
+            ValidateRemoveOldEventsJobSchedule();
             TriggerBuilder builder = TriggerBuilder.Create()
                 .WithIdentity(RemoveOldEventsTriggerKey);
             if (startAt != null)
@@ -108,5 +110,21 @@ namespace FQCS.DeviceAdmin.Scheduler
         {
             Scheduler.Shutdown().Wait();
         }
+
+        #region Validation
+        public void ValidateRemoveOldEventsJobSchedule()
+        {
+            if (RemoveOldEventsJobSettings.KeepDays == null)
+                throw new Exception("Invalid settings");
+        }
+
+        public void ValidateSendUnsentJobSchedule()
+        {
+            if (SendUnsentEventsJobSettings.CurrentConfig == null ||
+                SendUnsentEventsJobSettings.KafkaProducer == null)
+                throw new Exception("Invalid settings");
+        }
+        #endregion
+
     }
 }

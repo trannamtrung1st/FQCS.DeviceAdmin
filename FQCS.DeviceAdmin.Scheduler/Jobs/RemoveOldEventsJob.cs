@@ -24,7 +24,7 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             provider = scope.ServiceProvider;
             var dContext = provider.GetRequiredService<DataContext>();
             var qcEventService = provider.GetRequiredService<QCEventService>();
-            var entities = qcEventService.QCEvents.ExceptLast(settings.KeepDays);
+            var entities = qcEventService.QCEvents.ExceptLast(settings.KeepDays.Value);
             var removed = qcEventService.DeleteQCEvents(entities);
             Console.WriteLine($"Removed: {removed}");
         }
@@ -32,6 +32,6 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
 
     public class RemoveOldEventsJobSettings
     {
-        public int KeepDays { get; set; }
+        public int? KeepDays { get; set; }
     }
 }

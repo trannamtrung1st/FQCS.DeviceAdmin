@@ -28,6 +28,8 @@ using FQCS.DeviceAdmin.Business.Services;
 using FQCS.DeviceAdmin.Business.Queries;
 using FQCS.DeviceAdmin.Kafka;
 using Confluent.Kafka;
+using FQCS.DeviceAdmin.Scheduler;
+using Newtonsoft.Json;
 
 namespace FQCS.DeviceAdmin.WebApi
 {
@@ -40,6 +42,8 @@ namespace FQCS.DeviceAdmin.WebApi
             configuration.Bind("WebApiSettings", WebApi.Settings.Instance);
         }
 
+        private static FQCSScheduler _scheduler;
+        private IServiceCollection _services;
         public IConfiguration Configuration { get; }
         public static DeviceConfig CurrentConfig { get; private set; }
         public static string ConnStr { get; private set; }
@@ -59,6 +63,7 @@ namespace FQCS.DeviceAdmin.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            _services = services;
             ServiceInjection.Register(new List<Assembly>()
             {
                 Assembly.GetExecutingAssembly()
@@ -188,11 +193,14 @@ namespace FQCS.DeviceAdmin.WebApi
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            IHostApplicationLifetime appLifetime,
             DeviceConfigService configService)
         {
+            appLifetime.ApplicationStopping.Register(ApplicationShutdown);
             PrepareEnvironment(env);
             WebRootPath = env.WebRootPath;
             Settings.Instance.WebRootPath = env.WebRootPath;
+            SetupScheduler();
             var config = configService.DeviceConfigs.IsCurrent().FirstOrDefault();
             if (config != null)
                 SetCurrentConfig(config);
@@ -229,6 +237,13 @@ namespace FQCS.DeviceAdmin.WebApi
             });
         }
 
+        private void SetupScheduler()
+        {
+            var provider = _services.BuildServiceProvider();
+            _scheduler = new FQCSScheduler(provider);
+            _scheduler.Start().Wait();
+        }
+
         private void PrepareEnvironment(IWebHostEnvironment env)
         {
             var uploadPath = Settings.Instance.UploadFolderPath;
@@ -239,6 +254,7 @@ namespace FQCS.DeviceAdmin.WebApi
 
         public static void SetCurrentConfig(DeviceConfig config)
         {
+            var oldConfig = CurrentConfig;
             CurrentConfig = config;
             try
             {
@@ -254,6 +270,32 @@ namespace FQCS.DeviceAdmin.WebApi
                 }
             }
             catch (Exception) { }
+
+            // scheduler
+            if (CurrentConfig == null)
+            {
+                Task.WhenAll(_scheduler.UnscheduleRemoveOldEventsJob(),
+                    _scheduler.UnscheduleSendUnsentEventsJob()).Wait();
+                return;
+            }
+            _scheduler.RemoveOldEventsJobSettings.KeepDays = CurrentConfig.KeepQCEventDays;
+            _scheduler.SendUnsentEventsJobSettings.ConnStr = Startup.ConnStr;
+            _scheduler.SendUnsentEventsJobSettings.CurrentConfig = CurrentConfig;
+            _scheduler.SendUnsentEventsJobSettings.KafkaProducer = KafkaProducer;
+            _scheduler.SendUnsentEventsJobSettings.QCEventImageFolderPath = Settings.Instance.QCEventImageFolderPath;
+            _scheduler.SendUnsentEventsJobSettings.SleepSecs = CurrentConfig.SleepSecsWhenSendingUnsentEvents;
+            if (CurrentConfig.IsRemoveOldEventsJobEnabled)
+            {
+                _scheduler.ScheduleRemoveOldEventsJob(
+                           CurrentConfig.RemoveJobSecondsInterval.Value, CurrentConfig.NextJobStart).Wait();
+            }
+        }
+
+        private void ApplicationShutdown()
+        {
+            _scheduler.Dispose();
+            if (KafkaProducer != null)
+                KafkaProducer.Dispose();
         }
     }
 }
