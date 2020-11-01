@@ -110,7 +110,7 @@
                 url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API',
                 type: 'get',
                 data: {
-                    id: @Model.Id,
+                    id: '@Model.Id',
                     fields: '@QCEventQueryProjection.INFO,@QCEventQueryProjection.IMAGE',
                     single_only: true
                 },

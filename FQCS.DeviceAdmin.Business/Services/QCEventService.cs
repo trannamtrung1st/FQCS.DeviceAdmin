@@ -200,8 +200,10 @@ namespace FQCS.DeviceAdmin.Business.Services
                         new DbContextOptionsBuilder<DataContext>().UseSqlServer(connStr).Options);
                     context.QCEvent.Id(entity.Id).First().NotiSent = true;
                     context.SaveChanges();
+                    QCEvent.CheckedEvents.Remove(entity.Id);
                 }
             });
+            QCEvent.CheckedEvents.Add(entity.Id);
         }
 
         public QCEvent CreateQCEvent(CreateQCEventModel model)
@@ -241,6 +243,12 @@ namespace FQCS.DeviceAdmin.Business.Services
         #endregion
 
         #region Validation
+        public ValidationData ValidateSendEvents(
+            ClaimsPrincipal principal)
+        {
+            return new ValidationData();
+        }
+
         public ValidationData ValidateClearAllEvents(
             ClaimsPrincipal principal)
         {

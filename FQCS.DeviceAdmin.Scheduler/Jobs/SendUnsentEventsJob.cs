@@ -30,12 +30,14 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             var entities = qcEventService.QCEvents.Unsent().ToList();
             foreach (var entity in entities)
             {
-                if (settings.SleepSecs != null)
-                    Thread.Sleep(settings.SleepSecs.Value * 1000);
-                if (scheduler.KafkaProducer != null)
+                if (scheduler.KafkaProducer != null && !QCEvent.CheckedEvents.Contains(entity.Id))
+                {
                     qcEventService.ProduceEventToKafkaServer(scheduler.KafkaProducer,
                         entity, scheduler.CurrentConfig, scheduler.QCEventImageFolderPath,
                         scheduler.ConnStr);
+                    if (settings.SleepSecs != null)
+                        Thread.Sleep(settings.SleepSecs.Value * 1000);
+                }
             }
         }
     }

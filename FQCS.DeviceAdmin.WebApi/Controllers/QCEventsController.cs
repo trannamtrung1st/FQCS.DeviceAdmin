@@ -75,6 +75,19 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
         [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [HttpPost("send-events")]
+        public async Task<IActionResult> SendUnsentEvents()
+        {
+            var validationData = _service.ValidateSendEvents(User);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var dt = await Startup.Scheduler.TriggerSendUnsentEventsJob(null);
+            return Ok(AppResult.Success(dt));
+        }
+
+
+        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
         [HttpPost("clear")]
         public async Task<IActionResult> ClearAllEvents()
         {

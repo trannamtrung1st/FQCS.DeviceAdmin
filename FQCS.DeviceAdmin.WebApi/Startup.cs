@@ -42,7 +42,7 @@ namespace FQCS.DeviceAdmin.WebApi
             configuration.Bind("WebApiSettings", WebApi.Settings.Instance);
         }
 
-        private static FQCSScheduler _scheduler;
+        public static FQCSScheduler Scheduler { get; private set; }
         private IServiceCollection _services;
         public IConfiguration Configuration { get; }
         public static DeviceConfig CurrentConfig { get; private set; }
@@ -240,8 +240,8 @@ namespace FQCS.DeviceAdmin.WebApi
         private void SetupScheduler()
         {
             var provider = _services.BuildServiceProvider();
-            _scheduler = new FQCSScheduler(provider);
-            _scheduler.Start().Wait();
+            Scheduler = new FQCSScheduler(provider);
+            Scheduler.Start().Wait();
         }
 
         private void PrepareEnvironment(IWebHostEnvironment env)
@@ -274,33 +274,35 @@ namespace FQCS.DeviceAdmin.WebApi
             // scheduler
             if (CurrentConfig == null)
             {
-                Task.WhenAll(_scheduler.UnscheduleRemoveOldEventsJob(),
-                    _scheduler.UnscheduleSendUnsentEventsJob()).Wait();
+                Task.WhenAll(Scheduler.UnscheduleRemoveOldEventsJob(),
+                    Scheduler.UnscheduleSendUnsentEventsJob()).Wait();
                 return;
             }
-            _scheduler.ConnStr = Startup.ConnStr;
-            _scheduler.CurrentConfig = CurrentConfig;
-            _scheduler.KafkaProducer = KafkaProducer;
-            _scheduler.QCEventImageFolderPath = Settings.Instance.QCEventImageFolderPath;
-            JsonConvert.PopulateObject(CurrentConfig.SendUnsentEventsJobSettings, _scheduler.SendUnsentEventsJobSettings);
-            JsonConvert.PopulateObject(CurrentConfig.RemoveOldEventsJobSettings, _scheduler.RemoveOldEventsJobSettings);
-            if (_scheduler.SendUnsentEventsJobSettings.Enabled)
+            Scheduler.ConnStr = Startup.ConnStr;
+            Scheduler.CurrentConfig = CurrentConfig;
+            Scheduler.KafkaProducer = KafkaProducer;
+            Scheduler.QCEventImageFolderPath = Settings.Instance.QCEventImageFolderPath;
+            JsonConvert.PopulateObject(CurrentConfig.SendUnsentEventsJobSettings, Scheduler.SendUnsentEventsJobSettings);
+            JsonConvert.PopulateObject(CurrentConfig.RemoveOldEventsJobSettings, Scheduler.RemoveOldEventsJobSettings);
+            if (Scheduler.SendUnsentEventsJobSettings.Enabled)
             {
-                _scheduler.ScheduleSendUnsentEventsJob(
-                           _scheduler.SendUnsentEventsJobSettings.SecsInterval ?? 30,
-                           _scheduler.SendUnsentEventsJobSettings.NextJobStart).Wait();
+                Scheduler.ScheduleSendUnsentEventsJob(
+                           Scheduler.SendUnsentEventsJobSettings.SecsInterval ?? 30,
+                           CurrentConfig.NextSUEJobStart).Wait();
             }
-            if (_scheduler.RemoveOldEventsJobSettings.Enabled)
+            else Scheduler.UnscheduleSendUnsentEventsJob().Wait();
+            if (Scheduler.RemoveOldEventsJobSettings.Enabled)
             {
-                _scheduler.ScheduleRemoveOldEventsJob(
-                           _scheduler.RemoveOldEventsJobSettings.SecsInterval ?? 30,
-                           _scheduler.RemoveOldEventsJobSettings.NextJobStart).Wait();
+                Scheduler.ScheduleRemoveOldEventsJob(
+                           Scheduler.RemoveOldEventsJobSettings.SecsInterval ?? 30,
+                           CurrentConfig.NextROEJobStart).Wait();
             }
+            else Scheduler.UnscheduleRemoveOldEventsJob().Wait();
         }
 
         private void ApplicationShutdown()
         {
-            _scheduler.Dispose();
+            Scheduler.Dispose();
             if (KafkaProducer != null)
                 KafkaProducer.Dispose();
         }

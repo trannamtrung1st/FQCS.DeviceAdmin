@@ -66,6 +66,52 @@
                                 <label>Kafka password reset</label>
                                 <input type="password" name="kafka_password_reset" class="form-control" placeholder="Leave blank if there's no update">
                             </div>
+                            <hr />
+                            <div id="roe-section">
+                                <h3>JOB: Remove old events</h3>
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input id="roe-cb-enabled" name="enabled" value="true"
+                                               class="custom-control-input" type="checkbox" />
+                                        <label for="roe-cb-enabled" class="custom-control-label">Enabled</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hours interval</label>
+                                    <input type="number" name="secs_interval" class="form-control" placeholder="Please choose an interval">
+                                </div>
+                                <div class="form-group">
+                                    <label>Keep events within days</label>
+                                    <input type="number" name="keep_days" class="form-control" placeholder="Please enter a number">
+                                </div>
+                                <div class="form-group">
+                                    <label>Job start</label>
+                                    <input type="datetime-local" name="next_roe_job_start" class="form-control">
+                                </div>
+                            </div>
+                            <hr />
+                            <div id="sue-section">
+                                <h3>JOB: Send unsent events</h3>
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input id="sue-cb-enabled" name="enabled" value="true"
+                                               class="custom-control-input" type="checkbox" />
+                                        <label for="sue-cb-enabled" class="custom-control-label">Enabled</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hours interval</label>
+                                    <input type="number" name="secs_interval" class="form-control" placeholder="Please choose an interval">
+                                </div>
+                                <div class="form-group">
+                                    <label>Break seconds</label>
+                                    <input type="number" name="sleep_secs" class="form-control" placeholder="Please enter a number">
+                                </div>
+                                <div class="form-group">
+                                    <label>Job start</label>
+                                    <input type="datetime-local" name="next_sue_job_start" class="form-control">
+                                </div>
+                            </div>
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
@@ -130,7 +176,8 @@
                 data: {
                     id: @Model.Id,
                     fields: '@DeviceConfigQueryProjection.INFO',
-                    single_only: true
+                    single_only: true,
+                    date_format: '@Business.Constants.AppDateTimeFormat.SHORT_ISO',
                 },
                 success: (respData) => {
                     console.log(respData);
@@ -151,6 +198,18 @@
             formMain.find('[name=identifier]').val(data.identifier);
             formMain.find('[name=kafka_server]').val(data.kafka_server);
             formMain.find('[name=kafka_username]').val(data.kafka_username);
+            const roe_data = JSON.parse(data.remove_old_events_job_settings);
+            const sue_data = JSON.parse(data.send_unsent_events_job_settings);
+            const roe = formMain.find('#roe-section');
+            roe.find('[name=enabled]').prop('checked', roe_data.enabled);
+            roe.find('[name=secs_interval]').val(roe_data.secs_interval / 3600.0);
+            roe.find('[name=keep_days]').val(roe_data.keep_days);
+            roe.find('[name=next_roe_job_start]').val(data.next_roe_job_start?.display);
+            const sue = formMain.find('#sue-section');
+            sue.find('[name=enabled]').prop('checked', sue_data.enabled);
+            sue.find('[name=secs_interval]').val(sue_data.secs_interval / 3600.0);
+            sue.find('[name=sleep_secs]').val(sue_data.sleep_secs);
+            sue.find('[name=next_sue_job_start]').val(data.next_sue_job_start?.display);
         }
 
         function confirmSubmit() {
@@ -166,6 +225,18 @@
             model.kafka_server = $('[name=kafka_server]').val();
             model.kafka_username = $('[name=kafka_username]').val();
             model.kafka_password_reset = $('[name=kafka_password_reset]').val();
+            const roe = {};
+            roe.enabled = $('#roe-section [name=enabled]:checked').length > 0;
+            roe.secs_interval = parseFloat($('#roe-section [name=secs_interval]').val()) * 3600;
+            roe.keep_days = $('#roe-section [name=keep_days]').val();
+            model.next_roe_job_start = $('#roe-section [name=next_roe_job_start]').val();
+            const sue = {};
+            sue.enabled = $('#sue-section [name=enabled]:checked').length > 0;
+            sue.secs_interval = parseFloat($('#sue-section [name=secs_interval]').val()) * 3600;
+            sue.sleep_secs = $('#sue-section [name=sleep_secs]').val();
+            model.next_sue_job_start = $('#sue-section [name=next_sue_job_start]').val();
+            model.remove_old_events_job_settings = roe;
+            model.send_unsent_events_job_settings = sue;
             changeLoading(true);
             $.ajax({
                 url: '@apiUrl/@Business.Constants.ApiEndpoint.DEVICE_CONFIG_API/@Model.Id',

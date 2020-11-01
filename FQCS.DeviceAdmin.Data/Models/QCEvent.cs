@@ -7,6 +7,9 @@ namespace FQCS.DeviceAdmin.Data.Models
 {
     public class QCEvent
     {
+        // cache
+        public static ISet<string> CheckedEvents { get; } = new HashSet<string>();
+
         public string Id { get; set; }
         public string DefectTypeCode { get; set; }
         public DateTime LastUpdated { get; set; }

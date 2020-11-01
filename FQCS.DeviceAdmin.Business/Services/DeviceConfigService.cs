@@ -15,10 +15,6 @@ namespace FQCS.DeviceAdmin.Business.Services
 {
     public class DeviceConfigService : Service
     {
-        private static JsonSerializerSettings appJsonSettings = new JsonSerializerSettings
-        {
-            DateFormatString = Constants.AppDateTimeFormat.ISO
-        };
 
         public DeviceConfigService(ServiceInjection inj) : base(inj)
         {
@@ -68,6 +64,28 @@ namespace FQCS.DeviceAdmin.Business.Services
                                 display = timeStr,
                                 iso = $"{time.ToUniversalTime():s}Z"
                             };
+                            if (entity.NextROEJobStart != null)
+                            {
+                                time = entity.NextROEJobStart.Value
+                                    .ToDefaultTimeZone();
+                                timeStr = time.ToString(options.date_format);
+                                obj["next_roe_job_start"] = new
+                                {
+                                    display = timeStr,
+                                    iso = $"{time.ToUniversalTime():s}Z"
+                                };
+                            }
+                            if (entity.NextSUEJobStart != null)
+                            {
+                                time = entity.NextSUEJobStart.Value
+                                    .ToDefaultTimeZone();
+                                timeStr = time.ToString(options.date_format);
+                                obj["next_sue_job_start"] = new
+                                {
+                                    display = timeStr,
+                                    iso = $"{time.ToUniversalTime():s}Z"
+                                };
+                            }
                         }
                         break;
                 }
@@ -142,9 +160,9 @@ namespace FQCS.DeviceAdmin.Business.Services
             var entity = model.ToDest();
 
             entity.RemoveOldEventsJobSettings = JsonConvert.SerializeObject(
-                model.RemoveOldEventsJobSettingsObj, appJsonSettings);
+                model.RemoveOldEventsJobSettingsObj);
             entity.SendUnsentEventsJobSettings = JsonConvert.SerializeObject(
-                model.SendUnsentEventsJobSettingsObj, appJsonSettings);
+                model.SendUnsentEventsJobSettingsObj);
 
             PrepareCreate(entity);
             return context.DeviceConfig.Add(entity).Entity;
@@ -172,7 +190,13 @@ namespace FQCS.DeviceAdmin.Business.Services
         public void UpdateDeviceConfig(DeviceConfig entity, UpdateDeviceConfigModel model)
         {
             model.CopyTo(entity);
-            if (model.KafkaPasswordReset != null)
+
+            entity.RemoveOldEventsJobSettings = JsonConvert.SerializeObject(
+                model.RemoveOldEventsJobSettingsObj);
+            entity.SendUnsentEventsJobSettings = JsonConvert.SerializeObject(
+                model.SendUnsentEventsJobSettingsObj);
+
+            if (!string.IsNullOrWhiteSpace(model.KafkaPasswordReset))
                 entity.KafkaPassword = model.KafkaPasswordReset;
             PrepareUpdate(entity);
         }

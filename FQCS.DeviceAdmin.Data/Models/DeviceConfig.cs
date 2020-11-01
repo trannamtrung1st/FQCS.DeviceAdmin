@@ -18,9 +18,11 @@ namespace FQCS.DeviceAdmin.Data.Models
 
         // Remove events job settings
         public string RemoveOldEventsJobSettings { get; set; }
+        public DateTime? NextROEJobStart { get; set; }
 
         // Send unsent job settings
         public string SendUnsentEventsJobSettings { get; set; }
+        public DateTime? NextSUEJobStart { get; set; }
 
     }
 }
