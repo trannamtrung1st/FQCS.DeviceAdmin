@@ -1,4 +1,7 @@
-﻿using FQCS.DeviceAdmin.Scheduler.Jobs;
+﻿using Confluent.Kafka;
+using FQCS.DeviceAdmin.Business.Models;
+using FQCS.DeviceAdmin.Data.Models;
+using FQCS.DeviceAdmin.Scheduler.Jobs;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
@@ -12,6 +15,11 @@ namespace FQCS.DeviceAdmin.Scheduler
     public class FQCSScheduler : IDisposable
     {
         public IScheduler Scheduler { get; private set; }
+        public DeviceConfig CurrentConfig { get; set; }
+        public IProducer<Null, string> KafkaProducer { get; set; }
+        public string QCEventImageFolderPath { get; set; }
+        public string ConnStr { get; set; }
+
         public RemoveOldEventsJobSettings RemoveOldEventsJobSettings { get; }
         public SendUnsentEventsJobSettings SendUnsentEventsJobSettings { get; }
         protected readonly IServiceProvider serviceProvider;
@@ -46,6 +54,7 @@ namespace FQCS.DeviceAdmin.Scheduler
                 .WithIdentity(RemoveOldEventsJobKey)
                 .UsingJobData(new JobDataMap()
                 {
+                    { Constants.CommonDataKey.FQCS_SCHEDULER, this },
                     { Constants.CommonDataKey.SETTINGS, RemoveOldEventsJobSettings },
                     { Constants.CommonDataKey.SERVICE_PROVIDER, serviceProvider },
                     { Constants.CommonDataKey.JOB_INFO, new JobInfo() }
@@ -56,6 +65,7 @@ namespace FQCS.DeviceAdmin.Scheduler
                 .WithIdentity(SendUnsentEventsJobKey)
                 .UsingJobData(new JobDataMap()
                 {
+                    { Constants.CommonDataKey.FQCS_SCHEDULER, this },
                     { Constants.CommonDataKey.SETTINGS, SendUnsentEventsJobSettings },
                     { Constants.CommonDataKey.SERVICE_PROVIDER, serviceProvider },
                     { Constants.CommonDataKey.JOB_INFO, new JobInfo() }
@@ -63,7 +73,22 @@ namespace FQCS.DeviceAdmin.Scheduler
             await Scheduler.AddJob(job, true);
         }
 
-        public async Task<DateTimeOffset?> ScheduleSendUnsentEventsJob(DateTime? startAt)
+        public async Task<DateTimeOffset?> TriggerSendUnsentEventsJob(DateTime? startAt)
+        {
+            ValidateSendUnsentJobSchedule();
+            TriggerBuilder builder = TriggerBuilder.Create()
+                .WithIdentity(nameof(SendUnsentEventsJob) + Guid.NewGuid().ToString(), Constants.Group.General);
+            if (startAt != null)
+                builder = builder.StartAt(startAt.Value);
+            else builder = builder.StartNow();
+            var trigger = builder.ForJob(SendUnsentEventsJobKey).Build();
+            var oldTrigger = await Scheduler.GetTrigger(SendUnsentEventsJobTriggerKey);
+            if (oldTrigger != null)
+                return await Scheduler.RescheduleJob(SendUnsentEventsJobTriggerKey, trigger);
+            return await Scheduler.ScheduleJob(trigger);
+        }
+
+        public async Task<DateTimeOffset?> ScheduleSendUnsentEventsJob(int intervalSecs, DateTime? startAt)
         {
             ValidateSendUnsentJobSchedule();
             TriggerBuilder builder = TriggerBuilder.Create()
@@ -71,6 +96,9 @@ namespace FQCS.DeviceAdmin.Scheduler
             if (startAt != null)
                 builder = builder.StartAt(startAt.Value);
             else builder = builder.StartNow();
+            builder = builder.WithSimpleSchedule(x => x
+                    .WithInterval(TimeSpan.FromSeconds(intervalSecs))
+                    .RepeatForever());
             var trigger = builder.ForJob(SendUnsentEventsJobKey).Build();
             var oldTrigger = await Scheduler.GetTrigger(SendUnsentEventsJobTriggerKey);
             if (oldTrigger != null)
@@ -120,8 +148,7 @@ namespace FQCS.DeviceAdmin.Scheduler
 
         public void ValidateSendUnsentJobSchedule()
         {
-            if (SendUnsentEventsJobSettings.CurrentConfig == null ||
-                SendUnsentEventsJobSettings.KafkaProducer == null)
+            if (CurrentConfig == null || KafkaProducer == null)
                 throw new Exception("Invalid settings");
         }
         #endregion

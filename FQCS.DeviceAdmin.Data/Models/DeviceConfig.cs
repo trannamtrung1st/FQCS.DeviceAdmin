@@ -17,13 +17,10 @@ namespace FQCS.DeviceAdmin.Data.Models
         public bool IsCurrent { get; set; }
 
         // Remove events job settings
-        public bool IsRemoveOldEventsJobEnabled { get; set; }
-        public int? RemoveJobSecondsInterval { get; set; }
-        public int? KeepQCEventDays { get; set; }
-        public DateTime? NextJobStart { get; set; }
+        public string RemoveOldEventsJobSettings { get; set; }
 
         // Send unsent job settings
-        public int? SleepSecsWhenSendingUnsentEvents { get; set; }
+        public string SendUnsentEventsJobSettings { get; set; }
 
     }
 }

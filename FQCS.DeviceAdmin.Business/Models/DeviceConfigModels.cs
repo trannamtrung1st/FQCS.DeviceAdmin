@@ -4,9 +4,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FQCS.DeviceAdmin.Business.Helpers;
 
 namespace FQCS.DeviceAdmin.Business.Models
 {
+
+    public class SendUnsentEventsJobSettings
+    {
+        [JsonProperty("secs_interval")]
+        public int? SecsInterval { get; set; }
+        [JsonProperty("enabled")]
+        public bool Enabled { get; set; }
+        [JsonProperty("sleep_secs")]
+        public int? SleepSecs { get; set; }
+        [JsonProperty("next_job_start")]
+        [JsonConverter(typeof(DefaultDateTimeConverter), Constants.AppDateTimeFormat.ISO)]
+        public DateTime? NextJobStart { get; set; }
+    }
+
+    public class RemoveOldEventsJobSettings
+    {
+        [JsonProperty("secs_interval")]
+        public int? SecsInterval { get; set; }
+        [JsonProperty("enabled")]
+        public bool Enabled { get; set; }
+        [JsonProperty("keep_days")]
+        public int? KeepDays { get; set; }
+        [JsonProperty("next_job_start")]
+        [JsonConverter(typeof(DefaultDateTimeConverter), Constants.AppDateTimeFormat.ISO)]
+        public DateTime? NextJobStart { get; set; }
+    }
+
     public class CreateDeviceConfigModel : MappingModel<DeviceConfig>
     {
         public CreateDeviceConfigModel()
@@ -26,6 +54,14 @@ namespace FQCS.DeviceAdmin.Business.Models
         // encrypted
         [JsonProperty("kafka_password")]
         public string KafkaPassword { get; set; }
+
+        // Remove events job settings
+        [JsonProperty("remove_old_events_job_settings")]
+        public RemoveOldEventsJobSettings RemoveOldEventsJobSettingsObj { get; set; }
+
+        // Send unsent job settings
+        [JsonProperty("send_unsent_events_job_settings")]
+        public SendUnsentEventsJobSettings SendUnsentEventsJobSettingsObj { get; set; }
     }
 
     public class UpdateDeviceConfigModel : MappingModel<DeviceConfig>
@@ -48,6 +84,13 @@ namespace FQCS.DeviceAdmin.Business.Models
         [JsonProperty("kafka_password_reset")]
         public string KafkaPasswordReset { get; set; }
 
+        // Remove events job settings
+        [JsonProperty("remove_old_events_job_settings")]
+        public RemoveOldEventsJobSettings RemoveOldEventsJobSettingsObj { get; set; }
+
+        // Send unsent job settings
+        [JsonProperty("send_unsent_events_job_settings")]
+        public SendUnsentEventsJobSettings SendUnsentEventsJobSettingsObj { get; set; }
     }
 
     public class ChangeCurrentDeviceConfigModel

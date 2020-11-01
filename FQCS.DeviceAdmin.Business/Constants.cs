@@ -79,6 +79,7 @@ namespace FQCS.DeviceAdmin.Business
         public static class AppDateTimeFormat
         {
             public const string DEFAULT_DATE_FORMAT = "dd/MM/yyyy";
+            public const string ISO = "yyyy-MM-ddTHH:mm";
         }
 
         public static class AppTimeZone

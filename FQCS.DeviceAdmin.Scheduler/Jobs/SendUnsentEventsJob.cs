@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using FQCS.DeviceAdmin.Business.Models;
 using FQCS.DeviceAdmin.Business.Queries;
 using FQCS.DeviceAdmin.Business.Services;
 using FQCS.DeviceAdmin.Data.Models;
@@ -19,6 +20,7 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
         {
             await base.Execute(context);
             var data = context.JobDetail.JobDataMap;
+            var scheduler = data[Constants.CommonDataKey.FQCS_SCHEDULER] as FQCSScheduler;
             var settings = data[Constants.CommonDataKey.SETTINGS] as SendUnsentEventsJobSettings;
             var provider = data[Constants.CommonDataKey.SERVICE_PROVIDER] as IServiceProvider;
             using var scope = provider.CreateScope();
@@ -30,20 +32,12 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             {
                 if (settings.SleepSecs != null)
                     Thread.Sleep(settings.SleepSecs.Value * 1000);
-                if (settings.KafkaProducer != null)
-                    qcEventService.ProduceEventToKafkaServer(settings.KafkaProducer,
-                        entity, settings.CurrentConfig, settings.QCEventImageFolderPath,
-                        settings.ConnStr);
+                if (scheduler.KafkaProducer != null)
+                    qcEventService.ProduceEventToKafkaServer(scheduler.KafkaProducer,
+                        entity, scheduler.CurrentConfig, scheduler.QCEventImageFolderPath,
+                        scheduler.ConnStr);
             }
         }
     }
 
-    public class SendUnsentEventsJobSettings
-    {
-        public int? SleepSecs { get; set; }
-        public DeviceConfig CurrentConfig { get; set; }
-        public IProducer<Null, string> KafkaProducer { get; set; }
-        public string QCEventImageFolderPath { get; set; }
-        public string ConnStr { get; set; }
-    }
 }

@@ -278,16 +278,23 @@ namespace FQCS.DeviceAdmin.WebApi
                     _scheduler.UnscheduleSendUnsentEventsJob()).Wait();
                 return;
             }
-            _scheduler.RemoveOldEventsJobSettings.KeepDays = CurrentConfig.KeepQCEventDays;
-            _scheduler.SendUnsentEventsJobSettings.ConnStr = Startup.ConnStr;
-            _scheduler.SendUnsentEventsJobSettings.CurrentConfig = CurrentConfig;
-            _scheduler.SendUnsentEventsJobSettings.KafkaProducer = KafkaProducer;
-            _scheduler.SendUnsentEventsJobSettings.QCEventImageFolderPath = Settings.Instance.QCEventImageFolderPath;
-            _scheduler.SendUnsentEventsJobSettings.SleepSecs = CurrentConfig.SleepSecsWhenSendingUnsentEvents;
-            if (CurrentConfig.IsRemoveOldEventsJobEnabled)
+            _scheduler.ConnStr = Startup.ConnStr;
+            _scheduler.CurrentConfig = CurrentConfig;
+            _scheduler.KafkaProducer = KafkaProducer;
+            _scheduler.QCEventImageFolderPath = Settings.Instance.QCEventImageFolderPath;
+            JsonConvert.PopulateObject(CurrentConfig.SendUnsentEventsJobSettings, _scheduler.SendUnsentEventsJobSettings);
+            JsonConvert.PopulateObject(CurrentConfig.RemoveOldEventsJobSettings, _scheduler.RemoveOldEventsJobSettings);
+            if (_scheduler.SendUnsentEventsJobSettings.Enabled)
+            {
+                _scheduler.ScheduleSendUnsentEventsJob(
+                           _scheduler.SendUnsentEventsJobSettings.SecsInterval ?? 30,
+                           _scheduler.SendUnsentEventsJobSettings.NextJobStart).Wait();
+            }
+            if (_scheduler.RemoveOldEventsJobSettings.Enabled)
             {
                 _scheduler.ScheduleRemoveOldEventsJob(
-                           CurrentConfig.RemoveJobSecondsInterval.Value, CurrentConfig.NextJobStart).Wait();
+                           _scheduler.RemoveOldEventsJobSettings.SecsInterval ?? 30,
+                           _scheduler.RemoveOldEventsJobSettings.NextJobStart).Wait();
             }
         }
 

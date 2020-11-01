@@ -9,11 +9,17 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 using FQCS.DeviceAdmin.Business.Helpers;
+using Newtonsoft.Json;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
     public class DeviceConfigService : Service
     {
+        private static JsonSerializerSettings appJsonSettings = new JsonSerializerSettings
+        {
+            DateFormatString = Constants.AppDateTimeFormat.ISO
+        };
+
         public DeviceConfigService(ServiceInjection inj) : base(inj)
         {
         }
@@ -44,6 +50,8 @@ namespace FQCS.DeviceAdmin.Business.Services
                             obj["is_current"] = entity.IsCurrent;
                             obj["kafka_server"] = entity.KafkaServer;
                             obj["kafka_username"] = entity.KafkaUsername;
+                            obj["remove_old_events_job_settings"] = entity.RemoveOldEventsJobSettings;
+                            obj["send_unsent_events_job_settings"] = entity.SendUnsentEventsJobSettings;
                             var time = entity.CreatedTime
                                 .ToDefaultTimeZone();
                             var timeStr = time.ToString(options.date_format);
@@ -132,6 +140,12 @@ namespace FQCS.DeviceAdmin.Business.Services
         public DeviceConfig CreateDeviceConfig(CreateDeviceConfigModel model)
         {
             var entity = model.ToDest();
+
+            entity.RemoveOldEventsJobSettings = JsonConvert.SerializeObject(
+                model.RemoveOldEventsJobSettingsObj, appJsonSettings);
+            entity.SendUnsentEventsJobSettings = JsonConvert.SerializeObject(
+                model.SendUnsentEventsJobSettingsObj, appJsonSettings);
+
             PrepareCreate(entity);
             return context.DeviceConfig.Add(entity).Entity;
         }

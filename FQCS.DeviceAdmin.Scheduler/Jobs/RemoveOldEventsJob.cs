@@ -1,4 +1,5 @@
-﻿using FQCS.DeviceAdmin.Business.Queries;
+﻿using FQCS.DeviceAdmin.Business.Models;
+using FQCS.DeviceAdmin.Business.Queries;
 using FQCS.DeviceAdmin.Business.Services;
 using FQCS.DeviceAdmin.Data.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +31,4 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
         }
     }
 
-    public class RemoveOldEventsJobSettings
-    {
-        public int? KeepDays { get; set; }
-    }
 }

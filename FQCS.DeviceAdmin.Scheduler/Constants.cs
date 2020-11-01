@@ -13,6 +13,7 @@ namespace FQCS.DeviceAdmin.Scheduler
 
         public static class CommonDataKey
         {
+            public const string FQCS_SCHEDULER = "FQCS_SCHEDULER";
             public const string JOB_INFO = "JOB_INFO";
             public const string SETTINGS = "SETTINGS";
             public const string SERVICE_PROVIDER = "SERVICE_PROVIDER";

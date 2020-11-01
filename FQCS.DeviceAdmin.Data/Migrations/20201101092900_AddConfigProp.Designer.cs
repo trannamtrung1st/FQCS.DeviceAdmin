@@ -4,14 +4,16 @@ using FQCS.DeviceAdmin.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FQCS.DeviceAdmin.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201101092900_AddConfigProp")]
+    partial class AddConfigProp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,15 +83,15 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0a3c7b33-1ce7-4808-9b8e-3f3ae931e82e",
-                            ConcurrencyStamp = "21a65020-eece-4f30-932c-1a916f5aed40",
+                            Id = "17792d6f-ca38-4e8c-92d9-14cb456adb16",
+                            ConcurrencyStamp = "b9584c78-d3b2-40ee-be09-c65ca36d7914",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "1f8ca895-7ba6-430a-af79-3f658c04d268",
-                            ConcurrencyStamp = "ee824b26-26a0-4259-9953-346f6bebfffe",
+                            Id = "74b1c592-997a-4c93-91fc-8e4e38de3c43",
+                            ConcurrencyStamp = "8a9d9dee-1462-4961-917d-4105e669bb1d",
                             Name = "Device",
                             NormalizedName = "DEVICE"
                         });
@@ -186,6 +188,9 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.Property<bool>("IsCurrent")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsRemoveOldEventsJobEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<string>("KafkaPassword")
                         .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
@@ -198,14 +203,20 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
 
+                    b.Property<int?>("KeepQCEventDays")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("RemoveOldEventsJobSettings")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("NextJobStart")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("SendUnsentEventsJobSettings")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("RemoveJobSecondsInterval")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SleepSecsWhenSendingUnsentEvents")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
