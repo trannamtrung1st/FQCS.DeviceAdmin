@@ -37,7 +37,12 @@
 
             <div class="card">
                 <div class="card-header">
-
+                    <button title="Clear all events" class="btn btn-primary float-right ml-2" onclick="confirmClear()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button title="Send unsent events to server" class="btn btn-primary float-right ml-2" onclick="confirmSendEvents()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -180,6 +185,55 @@
 
         function reloadTable() {
             tblMain.ajax.reload();
+        }
+
+
+        function confirmClear() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitClear();
+            });
+        }
+
+        function submitClear() {
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API/clear',
+                type: 'post',
+                success: (respData) => {
+                    successAlert("Clear successfully").then(reloadTable);
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function confirmSendEvents() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitSendEvents();
+            });
+        }
+
+        function submitSendEvents() {
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API/send-events',
+                type: 'post',
+                success: (respData) => {
+                    successAlert("Sent command successfully");
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
         }
 
     </script>
