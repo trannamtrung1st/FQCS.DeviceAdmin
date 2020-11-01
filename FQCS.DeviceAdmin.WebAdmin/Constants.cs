@@ -24,6 +24,8 @@ namespace FQCS.DeviceAdmin.WebAdmin
             public const string DEVICE_CONFIG = "/deviceconfig";
             public const string DEVICE_CONFIG_CREATE = "/deviceconfig/create";
             public const string DEVICE_CONFIG_DETAIL = "/deviceconfig/{id}";
+            public const string QC_EVENT = "/qcevent";
+            public const string QC_EVENT_DETAIL = "/qcevent/{id}";
             public const string ADMIN_ONLY = "/adminonly";
             public const string ACCESS_DENIED = "/accessdenied";
             public const string STATUS = "/status";
@@ -54,6 +56,7 @@ namespace FQCS.DeviceAdmin.WebAdmin
             public const string RESOURCE = "resource";
             public const string APP_CLIENT = "app_client";
             public const string DEVICE_CONFIG = "device_config";
+            public const string QC_EVENT = "qc_event";
             public const string ADMIN_ONLY = "admin_only";
         }
     }

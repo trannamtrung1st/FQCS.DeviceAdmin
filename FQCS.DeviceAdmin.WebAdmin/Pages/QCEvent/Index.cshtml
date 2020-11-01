@@ -1,0 +1,186 @@
+﻿@page
+@model FQCS.DeviceAdmin.WebAdmin.Pages.QCEvent.IndexModel
+@{
+    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
+}
+
+@section head {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Info.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Constants.Routing.DASHBOARD">Dashboard</a></li>
+                    <li class="breadcrumb-item active">@Model.Info.Title</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-header">
+
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <table id="tbl-main" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>No</th>
+                                <th>Id</th>
+                                <th class="sortable">Time</th>
+                                <th class="sortable">Defect type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>No</th>
+                                <th>Id</th>
+                                <th class="sortable">Time</th>
+                                <th class="sortable">Defect type</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+@section scripts {
+
+    <!-- DataTables -->
+    <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- Select2 -->
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+    <!-- page script -->
+    <script>
+        let tblMain;
+        $(function () {
+            tblMain = $("#tbl-main").DataTable({
+                serverSide: true,
+                processing: true,
+                responsive: true,
+                autoWidth: false,
+                searching: true,
+                ordering: true,
+                searchDelay: 500,
+                ajax: {
+                    url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API',
+                    data: function (d) {
+                        d.count_total = true;
+                        d.search = d.search?.value;
+                        d.page = d.start / d.length + 1;
+                        d.fields = '@QCEventQueryProjection.INFO';
+                        d.limit = d.length;
+                        if (d.order?.length) {
+                            const sorts = [];
+                            for (var i = 0; i < d.order.length; i++) {
+                                const ord = d.order[i];
+                                const colName = d.columns[ord.column].name;
+                                const dir = ord.dir[0];
+                                sorts.push(dir + colName);
+                            }
+                            d.sorts = sorts.join(',');
+                        }
+                    },
+                    dataFilter: function (jsonStr, type) {
+                        let jsonData = JSON.parse(jsonStr);
+                        console.log(jsonData);
+                        let data = jsonData.data;
+                        const list = data.list;
+                        const dtData = {};
+                        dtData.recordsTotal = data.count;
+                        dtData.recordsFiltered = data.count;
+                        dtData.data = list;
+                        return JSON.stringify(dtData);
+                    },
+                    error: function (xhr, error, code) {
+                        handleGeneralError(xhr);
+                    }
+                },
+                columnDefs: [
+                    {
+                        targets: 0,
+                        data: "id",
+                        render: function (data, type, row, meta) {
+                            var btn =
+                                "<div class=\"dropdown\">" +
+                                    "<button class=\"btn btn-primary dropdown-toggle btn-sm\"" +
+                                        "type=\"button\" id=\"btn-dropdown\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                                        "<i class=\"fa fa-list\"></i>" +
+                                    "</button>" +
+                                    "<div class=\"dropdown-menu\" aria-labelledby=\"btn-dropdown\">" +
+                                        "<a class=\"dropdown-item\" href=\"" + "@Constants.Routing.QC_EVENT_DETAIL".replace('{id}', data) + "\"><i class=\"fa fa-info-circle dropdown-item-icon\"></i>Detail</a>" +
+                                    "</div>" +
+                                "</div>";
+                            return btn;
+                        }
+                    },
+                    {
+                        targets: 1,
+                        render: function (data, type, row, meta) {
+                            return meta.settings._iDisplayStart + meta.row + 1;
+                        }
+                    },
+                    { targets: 2, data: "id" },
+                    {
+                        targets: 3,
+                        data: "created_time",
+                        name: "time",
+                        orderable: true,
+                        render: function (data, type, row, meta) {
+                            return data.display;
+                        }
+                    },
+                    {
+                        targets: 4,
+                        data: "defect_type_code",
+                        orderable: true,
+                        render: function (data, type, row, meta) {
+                            return data;
+                        }
+                    },
+                    { targets: "_all", orderable: false, defaultContent: '' },
+                ],
+                order: [[3, 'desc']]
+            });
+            $('.select2').select2();
+        });
+
+        function reloadTable() {
+            tblMain.ajax.reload();
+        }
+
+    </script>
+}
