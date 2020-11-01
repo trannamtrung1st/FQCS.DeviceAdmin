@@ -13,12 +13,14 @@ namespace FQCS.DeviceAdmin.Scheduler
     {
         public IScheduler Scheduler { get; private set; }
         public RemoveOldEventsJobSettings RemoveOldEventsJobSettings { get; }
+        public SendUnsentEventsJobSettings SendUnsentEventsJobSettings { get; }
         protected readonly IServiceProvider serviceProvider;
 
 
         public FQCSScheduler(IServiceProvider serviceProvider)
         {
             RemoveOldEventsJobSettings = new RemoveOldEventsJobSettings();
+            SendUnsentEventsJobSettings = new SendUnsentEventsJobSettings();
             this.serviceProvider = serviceProvider;
         }
 
@@ -27,6 +29,10 @@ namespace FQCS.DeviceAdmin.Scheduler
             = new JobKey(nameof(RemoveOldEventsJob), Constants.Group.General);
         public static readonly TriggerKey RemoveOldEventsTriggerKey
             = new TriggerKey(nameof(RemoveOldEventsJob), Constants.Group.General);
+        public static readonly JobKey SendUnsentEventsJobKey
+            = new JobKey(nameof(SendUnsentEventsJob), Constants.Group.General);
+        public static readonly TriggerKey SendUnsentEventsJobTriggerKey
+            = new TriggerKey(nameof(SendUnsentEventsJob), Constants.Group.General);
 
         public async Task Start()
         {
@@ -45,6 +51,35 @@ namespace FQCS.DeviceAdmin.Scheduler
                     { Constants.CommonDataKey.JOB_INFO, new JobInfo() }
                 }).StoreDurably(true).Build();
             await Scheduler.AddJob(job, true);
+
+            job = JobBuilder.Create<SendUnsentEventsJob>()
+                .WithIdentity(SendUnsentEventsJobKey)
+                .UsingJobData(new JobDataMap()
+                {
+                    { Constants.CommonDataKey.SETTINGS, SendUnsentEventsJobSettings },
+                    { Constants.CommonDataKey.SERVICE_PROVIDER, serviceProvider },
+                    { Constants.CommonDataKey.JOB_INFO, new JobInfo() }
+                }).StoreDurably(true).Build();
+            await Scheduler.AddJob(job, true);
+        }
+
+        public async Task<DateTimeOffset?> ScheduleSendUnsentEventsJob(DateTime? startAt)
+        {
+            TriggerBuilder builder = TriggerBuilder.Create()
+                .WithIdentity(SendUnsentEventsJobTriggerKey);
+            if (startAt != null)
+                builder = builder.StartAt(startAt.Value);
+            else builder = builder.StartNow();
+            var trigger = builder.ForJob(SendUnsentEventsJobKey).Build();
+            var oldTrigger = await Scheduler.GetTrigger(SendUnsentEventsJobTriggerKey);
+            if (oldTrigger != null)
+                return await Scheduler.RescheduleJob(SendUnsentEventsJobTriggerKey, trigger);
+            return await Scheduler.ScheduleJob(trigger);
+        }
+
+        public async Task<bool> UnscheduleSendUnsentEventsJob()
+        {
+            return await Scheduler.UnscheduleJob(SendUnsentEventsJobTriggerKey);
         }
 
         public async Task<DateTimeOffset?> ScheduleRemoveOldEventsJob(int intervalSecs, DateTime? startAt)

@@ -10,6 +10,12 @@ namespace FQCS.DeviceAdmin.Business.Queries
 {
     public static class QCEventQuery
     {
+
+        public static IQueryable<QCEvent> Unsent(this IQueryable<QCEvent> query)
+        {
+            return query.Where(o => o.NotiSent == false);
+        }
+
         public static IQueryable<QCEvent> Id(this IQueryable<QCEvent> query, int id)
         {
             return query.Where(o => o.Id == id);
