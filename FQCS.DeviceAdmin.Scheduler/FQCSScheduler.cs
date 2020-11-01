@@ -13,10 +13,13 @@ namespace FQCS.DeviceAdmin.Scheduler
     {
         public IScheduler Scheduler { get; private set; }
         public RemoveOldEventsJobSettings RemoveOldEventsJobSettings { get; }
+        protected readonly IServiceProvider serviceProvider;
 
-        public FQCSScheduler()
+
+        public FQCSScheduler(IServiceProvider serviceProvider)
         {
             RemoveOldEventsJobSettings = new RemoveOldEventsJobSettings();
+            this.serviceProvider = serviceProvider;
         }
 
         // static
@@ -38,6 +41,7 @@ namespace FQCS.DeviceAdmin.Scheduler
                 .UsingJobData(new JobDataMap()
                 {
                     { Constants.CommonDataKey.SETTINGS, RemoveOldEventsJobSettings },
+                    { Constants.CommonDataKey.SERVICE_PROVIDER, serviceProvider },
                     { Constants.CommonDataKey.JOB_INFO, new JobInfo() }
                 }).StoreDurably(true).Build();
             await Scheduler.AddJob(job, true);
