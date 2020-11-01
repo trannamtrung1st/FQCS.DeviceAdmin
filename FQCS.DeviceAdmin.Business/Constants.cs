@@ -80,6 +80,8 @@ namespace FQCS.DeviceAdmin.Business
         {
             public const string DEFAULT_DATE_FORMAT = "dd/MM/yyyy";
             public const string SHORT_ISO = "yyyy-MM-ddTHH:mm";
+            public const string LONG_ISO = "yyyy-MM-ddTHH:mm:ssZ";
+            public const string LOCAL_TIME = "yyyy-MM-ddTHH:mm:ss";
         }
 
         public static class AppTimeZone

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FQCS.DeviceAdmin.Business.Helpers;
 
 namespace FQCS.DeviceAdmin.Business.Models
 {
@@ -118,6 +119,10 @@ namespace FQCS.DeviceAdmin.Business.Models
     {
         public string id { get; set; }
         public string defect_type { get; set; }
+        [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
+        public DateTime? from_time { get; set; }
+        [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
+        public DateTime? to_time { get; set; }
     }
 
     public class QCEventQueryPaging
