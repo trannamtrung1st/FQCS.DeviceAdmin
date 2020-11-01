@@ -1,0 +1,145 @@
+﻿@page
+@model FQCS.DeviceAdmin.WebAdmin.Pages.QCEvent.DetailModel
+@{
+    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
+}
+
+@section head {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Info.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Constants.Routing.DASHBOARD">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="@Constants.Routing.QC_EVENT">QC event</a></li>
+                    <li class="breadcrumb-item active">@Model.Info.Title</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- jquery validation -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fa fa-info-circle mr-1"></i>
+                            Info
+                        </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" id="form-main">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Id</label>
+                                <input type="text" name="id" class="form-control" disabled value="@Model.Id">
+                            </div>
+                            <div class="form-group">
+                                <label>Created time</label>
+                                <p name="created_time"></p>
+                            </div>
+                            <div class="form-group">
+                                <label>Defect type</label>
+                                <p><a href="#" name="defect_type_code"></a></p>
+                            </div>
+                            <div class="form-group">
+                                <label>Is noti sent</label>
+                                <p name="noti_sent"></p>
+                            </div>
+                            <div class="form-group">
+                                <label>Images</label>
+                                <p>
+                                    <div class="d-inline-block mr-5">
+                                        <div class="text-center">
+                                            Left
+                                        </div>
+                                        <img class="img-fluid" name="left_image" />
+                                    </div>
+                                    <div class="d-inline-block mr-5">
+                                        <div class="text-center">
+                                            Right
+                                        </div>
+                                        <img class="img-fluid" name="right_image" />
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!--/.col (left) -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+@section scripts {
+    <!-- jquery-validation -->
+    <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
+    <!-- Select2 -->
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+    <script type="text/javascript">
+        let tempData = null;
+        $(document).ready(async function () {
+            $('.select2').select2();
+            await getData();
+        });
+
+        function getData() {
+            changeLoading(true);
+            return $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API',
+                type: 'get',
+                data: {
+                    id: @Model.Id,
+                    fields: '@QCEventQueryProjection.INFO,@QCEventQueryProjection.IMAGE',
+                    single_only: true
+                },
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.single;
+                    tempData = data;
+                    processData(data);
+                },
+                error: (resp) => {
+                    handleGeneralError(resp, '@Constants.Routing.QC_EVENT');
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processData(data) {
+            const formMain = $('#form-main');
+            formMain.find('[name=created_time]').html(data.created_time.display);
+            formMain.find('[name=defect_type_code]').html(data.defect_type_code);
+            formMain.find('[name=noti_sent]').html(data.noti_sent ? 'Sent' : 'Not yet');
+            //data:image/jpeg;charset=utf-8;base64,
+            if (data.left_image)
+                formMain.find('[name=left_image]').attr('src', 'data:image/jpeg;charset=utf-8;base64,' + data.left_image_64);
+            if (data.right_image)
+                formMain.find('[name=right_image]').attr('src', 'data:image/jpeg;charset=utf-8;base64,' + data.right_image_64);
+        }
+
+    </script>
+}

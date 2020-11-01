@@ -46,7 +46,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var result = await _service.QueryQCEventDynamic(
-                projection, options, filter, sort, paging);
+                projection, options, filter, sort, paging, Settings.Instance.QCEventImageFolderPath);
             if (options.single_only && result == null)
                 return NotFound(AppResult.NotFound());
             return Ok(AppResult.Success(result));

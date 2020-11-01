@@ -38,7 +38,7 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public IDictionary<string, object> GetQCEventDynamic(
             QCEvent row, QCEventQueryProjection projection,
-            QCEventQueryOptions options)
+            QCEventQueryOptions options, string folderPath)
         {
             var obj = new Dictionary<string, object>();
             foreach (var f in projection.GetFieldsArr())
@@ -50,6 +50,7 @@ namespace FQCS.DeviceAdmin.Business.Services
                             var entity = row;
                             obj["id"] = entity.Id;
                             obj["defect_type_code"] = entity.DefectTypeCode;
+                            obj["noti_sent"] = entity.NotiSent;
                             obj["left_image"] = entity.LeftImage;
                             obj["right_image"] = entity.RightImage;
                             var time = entity.CreatedTime
@@ -70,6 +71,33 @@ namespace FQCS.DeviceAdmin.Business.Services
                             };
                         }
                         break;
+                    case QCEventQueryProjection.IMAGE:
+                        {
+                            if (!options.single_only)
+                                throw new Exception("Only single option can query image field");
+                            var entity = row;
+                            if (entity.LeftImage != null)
+                            {
+                                var fullPath = fileService.GetFilePath(folderPath, null, entity.LeftImage).Item2;
+                                if (File.Exists(fullPath))
+                                {
+                                    var img = File.ReadAllBytes(fullPath);
+                                    var img64 = Convert.ToBase64String(img);
+                                    obj["left_image_64"] = img64;
+                                }
+                            }
+                            if (entity.RightImage != null)
+                            {
+                                var fullPath = fileService.GetFilePath(folderPath, null, entity.RightImage).Item2;
+                                if (File.Exists(fullPath))
+                                {
+                                    var img = File.ReadAllBytes(fullPath);
+                                    var img64 = Convert.ToBase64String(img);
+                                    obj["right_image_64"] = img64;
+                                }
+                            }
+                        }
+                        break;
                 }
             }
             return obj;
@@ -77,12 +105,12 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public List<IDictionary<string, object>> GetQCEventDynamic(
             IEnumerable<QCEvent> rows, QCEventQueryProjection projection,
-            QCEventQueryOptions options)
+            QCEventQueryOptions options, string folderPath)
         {
             var list = new List<IDictionary<string, object>>();
             foreach (var o in rows)
             {
-                var obj = GetQCEventDynamic(o, projection, options);
+                var obj = GetQCEventDynamic(o, projection, options, folderPath);
                 list.Add(obj);
             }
             return list;
@@ -93,7 +121,8 @@ namespace FQCS.DeviceAdmin.Business.Services
             QCEventQueryOptions options,
             QCEventQueryFilter filter = null,
             QCEventQuerySort sort = null,
-            QCEventQueryPaging paging = null)
+            QCEventQueryPaging paging = null,
+            string folderPath = null)
         {
             var query = QCEvents;
             #region General
@@ -115,14 +144,14 @@ namespace FQCS.DeviceAdmin.Business.Services
             {
                 var single = query.SingleOrDefault();
                 if (single == null) return null;
-                var singleResult = GetQCEventDynamic(single, projection, options);
+                var singleResult = GetQCEventDynamic(single, projection, options, folderPath);
                 return new QueryResult<IDictionary<string, object>>()
                 {
                     Single = singleResult
                 };
             }
             var entities = query.ToList();
-            var list = GetQCEventDynamic(entities, projection, options);
+            var list = GetQCEventDynamic(entities, projection, options, folderPath);
             var result = new QueryResult<IDictionary<string, object>>();
             result.List = list;
             if (options.count_total) result.Count = totalCount;

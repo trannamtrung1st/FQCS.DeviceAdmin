@@ -74,6 +74,7 @@ namespace FQCS.DeviceAdmin.Business.Models
         //---------------------------------------
 
         public const string INFO = "info";
+        public const string IMAGE = "image";
         public const string SELECT = "select";
 
         public static readonly IDictionary<string, string[]> MAPS = new Dictionary<string, string[]>
@@ -113,6 +114,7 @@ namespace FQCS.DeviceAdmin.Business.Models
 
     public class QCEventQueryFilter
     {
+        public int? id { get; set; }
         public string defect_type { get; set; }
     }
 

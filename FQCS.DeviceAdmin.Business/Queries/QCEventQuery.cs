@@ -54,6 +54,8 @@ namespace FQCS.DeviceAdmin.Business.Queries
         public static IQueryable<QCEvent> Filter(
             this IQueryable<QCEvent> query, QCEventQueryFilter filter)
         {
+            if (filter.id != null)
+                query = query.Where(o => o.Id == filter.id);
             if (filter.defect_type != null)
                 query = query.Where(o => o.DefectTypeCode == filter.defect_type);
             return query;
