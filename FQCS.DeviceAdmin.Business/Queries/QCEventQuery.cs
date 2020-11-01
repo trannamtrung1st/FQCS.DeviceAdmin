@@ -11,6 +11,12 @@ namespace FQCS.DeviceAdmin.Business.Queries
     public static class QCEventQuery
     {
 
+        public static IQueryable<QCEvent> ExceptLast(this IQueryable<QCEvent> query, int days)
+        {
+            var lastKeepDate = DateTime.UtcNow.Date.Subtract(TimeSpan.FromDays(days));
+            return query.Where(o => o.CreatedTime.Date < lastKeepDate);
+        }
+
         public static IQueryable<QCEvent> Unsent(this IQueryable<QCEvent> query)
         {
             return query.Where(o => o.NotiSent == false);

@@ -233,6 +233,11 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
             return context.QCEvent.Remove(entity).Entity;
         }
+
+        public int DeleteQCEvents(IQueryable<QCEvent> entities)
+        {
+            return entities.BatchDelete();
+        }
         #endregion
 
         #region Validation
