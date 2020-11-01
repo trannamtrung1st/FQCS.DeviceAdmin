@@ -16,7 +16,7 @@ namespace FQCS.DeviceAdmin.Business.Queries
             return query.Where(o => o.NotiSent == false);
         }
 
-        public static IQueryable<QCEvent> Id(this IQueryable<QCEvent> query, int id)
+        public static IQueryable<QCEvent> Id(this IQueryable<QCEvent> query, string id)
         {
             return query.Where(o => o.Id == id);
         }
@@ -26,12 +26,12 @@ namespace FQCS.DeviceAdmin.Business.Queries
             return query.Select(o => new QCEvent { Id = o.Id });
         }
 
-        public static bool Exists(this IQueryable<QCEvent> query, int id)
+        public static bool Exists(this IQueryable<QCEvent> query, string id)
         {
             return query.Any(o => o.Id == id);
         }
 
-        public static IQueryable<QCEvent> Ids(this IQueryable<QCEvent> query, IEnumerable<int> ids)
+        public static IQueryable<QCEvent> Ids(this IQueryable<QCEvent> query, IEnumerable<string> ids)
         {
             return query.Where(o => ids.Contains(o.Id));
         }

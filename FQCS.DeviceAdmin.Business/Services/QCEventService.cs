@@ -162,6 +162,7 @@ namespace FQCS.DeviceAdmin.Business.Services
         #region Create QCEvent
         protected void PrepareCreate(QCEvent entity)
         {
+            entity.Id = Guid.NewGuid().ToString();
             entity.LastUpdated = DateTime.UtcNow;
         }
 
@@ -184,6 +185,7 @@ namespace FQCS.DeviceAdmin.Business.Services
             }
             mess.Value = JsonConvert.SerializeObject(new QCEventMessage
             {
+                Id = entity.Id,
                 CreatedTime = entity.CreatedTime,
                 QCDefectCode = entity.DefectTypeCode,
                 Identifier = currentConfig.Identifier,

@@ -81,15 +81,15 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4342787f-6e9e-4e5f-9fc2-342ae26486d4",
-                            ConcurrencyStamp = "f40996bc-0c06-41eb-ab69-c18b10571c38",
+                            Id = "aa477b03-420d-41ab-b2ce-9ebcc4fa833b",
+                            ConcurrencyStamp = "fb3af46c-987e-44ce-b013-51f5475f7a20",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "e2d18b99-7c98-4a2a-bb41-ddea48da3a7b",
-                            ConcurrencyStamp = "53f29ee4-8a27-4389-96b6-89aaf8d6605a",
+                            Id = "46fc171e-a78c-4703-a482-8d1e01e839aa",
+                            ConcurrencyStamp = "4944b781-fc9f-4b6a-8a6d-c93aab871cb7",
                             Name = "Device",
                             NormalizedName = "DEVICE"
                         });
@@ -208,10 +208,10 @@ namespace FQCS.DeviceAdmin.Data.Migrations
 
             modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.QCEvent", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)")
+                        .HasMaxLength(255)
+                        .IsUnicode(false);
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");

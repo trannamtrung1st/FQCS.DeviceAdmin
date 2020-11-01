@@ -9,6 +9,8 @@ namespace FQCS.DeviceAdmin.Business.Models
 {
     public class QCEventMessage
     {
+        [JsonProperty("id")]
+        public string Id { get; set; }
         // this is code from QC device
         [JsonProperty("qc_defect_code")]
         public string QCDefectCode { get; set; }
@@ -114,7 +116,7 @@ namespace FQCS.DeviceAdmin.Business.Models
 
     public class QCEventQueryFilter
     {
-        public int? id { get; set; }
+        public string id { get; set; }
         public string defect_type { get; set; }
     }
 

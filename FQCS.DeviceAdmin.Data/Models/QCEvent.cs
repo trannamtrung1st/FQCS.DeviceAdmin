@@ -7,7 +7,7 @@ namespace FQCS.DeviceAdmin.Data.Models
 {
     public class QCEvent
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string DefectTypeCode { get; set; }
         public DateTime LastUpdated { get; set; }
         public DateTime CreatedTime { get; set; }

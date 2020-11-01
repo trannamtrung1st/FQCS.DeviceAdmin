@@ -8,6 +8,22 @@ namespace FQCS.DeviceAdmin.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AppClient",
+                columns: table => new
+                {
+                    Id = table.Column<string>(unicode: false, maxLength: 100, nullable: false),
+                    SecretKey = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    ClientName = table.Column<string>(maxLength: 255, nullable: true),
+                    Description = table.Column<string>(maxLength: 2000, nullable: true),
+                    CreatedTime = table.Column<DateTime>(nullable: false),
+                    LastUpdated = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppClient", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -46,6 +62,42 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeviceConfig",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Identifier = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    KafkaServer = table.Column<string>(maxLength: 255, nullable: true),
+                    KafkaUsername = table.Column<string>(maxLength: 255, nullable: true),
+                    KafkaPassword = table.Column<string>(maxLength: 2000, nullable: true),
+                    CreatedTime = table.Column<DateTime>(nullable: false),
+                    LastUpdated = table.Column<DateTime>(nullable: false),
+                    IsCurrent = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceConfig", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QCEvent",
+                columns: table => new
+                {
+                    Id = table.Column<string>(unicode: false, maxLength: 255, nullable: false),
+                    DefectTypeCode = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    LastUpdated = table.Column<DateTime>(nullable: false),
+                    CreatedTime = table.Column<DateTime>(nullable: false),
+                    LeftImage = table.Column<string>(unicode: false, maxLength: 2000, nullable: true),
+                    RightImage = table.Column<string>(unicode: false, maxLength: 2000, nullable: true),
+                    NotiSent = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QCEvent", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,6 +219,16 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "aa477b03-420d-41ab-b2ce-9ebcc4fa833b", "fb3af46c-987e-44ce-b013-51f5475f7a20", "Administrator", "ADMINISTRATOR" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "46fc171e-a78c-4703-a482-8d1e01e839aa", "4944b781-fc9f-4b6a-8a6d-c93aab871cb7", "Device", "DEVICE" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -210,6 +272,9 @@ namespace FQCS.DeviceAdmin.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AppClient");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -223,6 +288,12 @@ namespace FQCS.DeviceAdmin.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "DeviceConfig");
+
+            migrationBuilder.DropTable(
+                name: "QCEvent");
 
             migrationBuilder.DropTable(
                 name: "Resource");

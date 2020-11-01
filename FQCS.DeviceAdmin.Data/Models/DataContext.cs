@@ -71,6 +71,9 @@ namespace FQCS.DeviceAdmin.Data.Models
             });
             modelBuilder.Entity<QCEvent>(entity =>
             {
+                entity.Property(e => e.Id)
+                    .IsUnicode(false)
+                    .HasMaxLength(255);
                 entity.Property(e => e.DefectTypeCode)
                     .IsUnicode(false)
                     .HasMaxLength(100);
