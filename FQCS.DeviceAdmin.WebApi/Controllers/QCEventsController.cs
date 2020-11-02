@@ -18,6 +18,7 @@ using System.IO.Compression;
 using System.IO;
 using elFinder.NetCore.Models;
 using System.Net.Mime;
+using FQCS.DeviceAdmin.Data.Models;
 
 namespace FQCS.DeviceAdmin.WebApi.Controllers
 {
@@ -65,6 +66,9 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var query = _service.GetQueryableQCEvent(options, filter, sort, paging);
             var updated = _service.UpdateEventsSentStatus(query, true);
+            var updatedIds = query.Select(o => o.Id).ToList();
+            foreach (var id in updatedIds)
+                QCEvent.CheckedEvents.Remove(id);
             return Ok(AppResult.Success(updated));
         }
 
