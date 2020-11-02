@@ -52,6 +52,22 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(result));
         }
 
+        [Authorize(Policy = Constants.Policy.And.APP_CLIENT)]
+        [HttpPut("sent-status")]
+        public async Task<IActionResult> UpdateSentStatus([FromQuery][QueryObject]QCEventQueryFilter filter,
+            [FromQuery]QCEventQuerySort sort,
+            [FromQuery]QCEventQueryPaging paging,
+            [FromQuery]QCEventQueryOptions options)
+        {
+            var validationData = _service.ValidateUpdateSentStatus(
+                User, filter, sort, paging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var query = _service.GetQueryableQCEvent(options, filter, sort, paging);
+            var updated = _service.UpdateEventsSentStatus(query, true);
+            return Ok(AppResult.Success(updated));
+        }
+
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
         [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
         [HttpGet("images")]

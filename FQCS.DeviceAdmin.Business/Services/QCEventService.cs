@@ -157,6 +157,23 @@ namespace FQCS.DeviceAdmin.Business.Services
             if (options.count_total) result.Count = totalCount;
             return result;
         }
+
+        public IQueryable<QCEvent> GetQueryableQCEvent(
+            QCEventQueryOptions options,
+            QCEventQueryFilter filter = null,
+            QCEventQuerySort sort = null,
+            QCEventQueryPaging paging = null)
+        {
+            var query = QCEvents;
+            if (filter != null) query = query.Filter(filter);
+            if (!options.single_only)
+            {
+                if (sort != null) query = query.Sort(sort);
+                if (paging != null && (!options.load_all || !QCEventQueryOptions.IsLoadAllAllowed))
+                    query = query.SelectPage(paging.page, paging.limit);
+            }
+            return query;
+        }
         #endregion
 
         #region Create QCEvent
@@ -192,18 +209,20 @@ namespace FQCS.DeviceAdmin.Business.Services
                 LeftB64Image = leftImgB64,
                 RightB64Image = rightImgB64,
             });
+            QCEvent.CheckedEvents.Add(entity.Id);
             producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess, report =>
             {
                 if (report.Status == PersistenceStatus.Persisted)
                 {
                     using var context = new DataContext(
                         new DbContextOptionsBuilder<DataContext>().UseSqlServer(connStr).Options);
-                    context.QCEvent.Id(entity.Id).First().NotiSent = true;
+                    entity = context.QCEvent.Id(entity.Id).First();
+                    entity.NotiSent = true;
+                    entity.LastUpdated = DateTime.UtcNow;
                     context.SaveChanges();
                     QCEvent.CheckedEvents.Remove(entity.Id);
                 }
             });
-            QCEvent.CheckedEvents.Add(entity.Id);
         }
 
         public QCEvent CreateQCEvent(CreateQCEventModel model)
@@ -217,6 +236,21 @@ namespace FQCS.DeviceAdmin.Business.Services
         #endregion
 
         #region Update QCEvent
+        protected void PrepareUpdate(QCEvent entity)
+        {
+            entity.LastUpdated = DateTime.UtcNow;
+        }
+
+        public int UpdateEventsSentStatus(IQueryable<QCEvent> entities, bool val)
+        {
+            var updated = new QCEvent
+            {
+                NotiSent = val
+            };
+            PrepareUpdate(updated);
+            return entities.BatchUpdate(updated, new List<string> {
+                nameof(QCEvent.NotiSent), nameof(QCEvent.LastUpdated) });
+        }
         #endregion
 
         #region Delete QCEvent
@@ -260,6 +294,17 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
             return new ValidationData();
         }
+
+        public ValidationData ValidateUpdateSentStatus(
+            ClaimsPrincipal principal,
+            QCEventQueryFilter filter,
+            QCEventQuerySort sort,
+            QCEventQueryPaging paging,
+            QCEventQueryOptions options)
+        {
+            return new ValidationData();
+        }
+
 
         public ValidationData ValidateGetQCEvents(
             ClaimsPrincipal principal,

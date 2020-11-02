@@ -74,6 +74,8 @@ namespace FQCS.DeviceAdmin.Business.Queries
                 query = query.Where(o => o.CreatedTime >= filter.from_time);
             if (filter.to_time != null)
                 query = query.Where(o => o.CreatedTime <= filter.to_time);
+            if (filter.sent != null)
+                query = query.Where(o => o.NotiSent == filter.sent);
             return query;
         }
 

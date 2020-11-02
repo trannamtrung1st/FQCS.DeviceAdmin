@@ -119,6 +119,7 @@ namespace FQCS.DeviceAdmin.Business.Models
     {
         public string id { get; set; }
         public string defect_type { get; set; }
+        public bool? sent { get; set; }
         [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
         public DateTime? from_time { get; set; }
         [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
