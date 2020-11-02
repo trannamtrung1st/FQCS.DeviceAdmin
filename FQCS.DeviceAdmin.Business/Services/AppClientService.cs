@@ -145,6 +145,7 @@ namespace FQCS.DeviceAdmin.Business.Services
         public void UpdateAppClient(AppClient entity, UpdateAppClientModel model)
         {
             model.CopyTo(entity);
+            PrepareUpdate(entity);
         }
         #endregion
 
