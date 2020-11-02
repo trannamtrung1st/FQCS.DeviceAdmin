@@ -15,14 +15,12 @@ using FQCS.DeviceAdmin.Kafka;
 using Confluent.Kafka;
 using Newtonsoft.Json;
 using EFCore.BulkExtensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
     public class QCEventService : Service
     {
-        [Inject]
-        protected readonly FileService fileService;
-
         public QCEventService(ServiceInjection inj) : base(inj)
         {
         }
@@ -38,7 +36,7 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public IDictionary<string, object> GetQCEventDynamic(
             QCEvent row, QCEventQueryProjection projection,
-            QCEventQueryOptions options, string folderPath)
+            QCEventQueryOptions options, string folderPath, FileService fileService)
         {
             var obj = new Dictionary<string, object>();
             foreach (var f in projection.GetFieldsArr())
@@ -105,12 +103,12 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public List<IDictionary<string, object>> GetQCEventDynamic(
             IEnumerable<QCEvent> rows, QCEventQueryProjection projection,
-            QCEventQueryOptions options, string folderPath)
+            QCEventQueryOptions options, string folderPath, FileService fileService)
         {
             var list = new List<IDictionary<string, object>>();
             foreach (var o in rows)
             {
-                var obj = GetQCEventDynamic(o, projection, options, folderPath);
+                var obj = GetQCEventDynamic(o, projection, options, folderPath, fileService);
                 list.Add(obj);
             }
             return list;
@@ -124,6 +122,7 @@ namespace FQCS.DeviceAdmin.Business.Services
             QCEventQueryPaging paging = null,
             string folderPath = null)
         {
+            var fileService = provider.GetRequiredService<FileService>();
             var query = QCEvents;
             #region General
             if (filter != null) query = query.Filter(filter);
@@ -144,14 +143,14 @@ namespace FQCS.DeviceAdmin.Business.Services
             {
                 var single = query.SingleOrDefault();
                 if (single == null) return null;
-                var singleResult = GetQCEventDynamic(single, projection, options, folderPath);
+                var singleResult = GetQCEventDynamic(single, projection, options, folderPath, fileService);
                 return new QueryResult<IDictionary<string, object>>()
                 {
                     Single = singleResult
                 };
             }
             var entities = query.ToList();
-            var list = GetQCEventDynamic(entities, projection, options, folderPath);
+            var list = GetQCEventDynamic(entities, projection, options, folderPath, fileService);
             var result = new QueryResult<IDictionary<string, object>>();
             result.List = list;
             if (options.count_total) result.Count = totalCount;
@@ -229,7 +228,7 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
             var entity = model.ToDest();
             entity.CreatedTime = DateTime.ParseExact(
-                model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture);
+                model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture).ToUtc();
             PrepareCreate(entity);
             return context.QCEvent.Add(entity).Entity;
         }
@@ -261,6 +260,7 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public void ClearAllQCEventImages(string dataFolder)
         {
+            var fileService = provider.GetRequiredService<FileService>();
             fileService.DeleteDirectory(dataFolder, "");
             Directory.CreateDirectory(dataFolder);
         }

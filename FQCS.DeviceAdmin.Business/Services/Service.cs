@@ -10,6 +10,8 @@ namespace FQCS.DeviceAdmin.Business.Services
     {
         [Inject]
         protected readonly DataContext context;
+        [Inject]
+        protected readonly IServiceProvider provider;
 
         public Service(ServiceInjection inj)
         {
