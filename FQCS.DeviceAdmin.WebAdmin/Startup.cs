@@ -18,6 +18,8 @@ using FQCS.DeviceAdmin.Business.Services;
 using FQCS.DeviceAdmin.Data.Models;
 using FQCS.DeviceAdmin.WebAdmin.Pages.Shared;
 using TNT.Core.Helpers.DI;
+using FQCS.DeviceAdmin.WebAdmin.Policies;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FQCS.DeviceAdmin.WebAdmin
 {
@@ -102,6 +104,14 @@ namespace FQCS.DeviceAdmin.WebAdmin
                     await SecurityStampValidator.ValidatePrincipalAsync(c);
                 };
             });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Constants.Policy.And.ADMIN, policy =>
+                    policy.Requirements.Add(new AuthUserRequirement(Data.Constants.RoleName.ADMIN, isOR: false)));
+                options.AddPolicy(Constants.Policy.Or.ADMIN, policy =>
+                    policy.Requirements.Add(new AuthUserRequirement(Data.Constants.RoleName.ADMIN, isOR: true)));
+            });
+            services.AddScoped<IAuthorizationHandler, AuthUserAuthHandler>();
             services.AddScoped<Layout>();
             services.AddControllers();
             services.AddRazorPages(options =>
@@ -116,7 +126,7 @@ namespace FQCS.DeviceAdmin.WebAdmin
                     .AddPageRoute("/AppUser/Detail", Constants.Routing.APP_USER_DETAIL)
                     .AddPageRoute("/Resource/Detail", Constants.Routing.RESOURCE_DETAIL);
                 foreach (var f in authorizeFolders)
-                    options.Conventions.AuthorizeFolder(f);
+                    options.Conventions.AuthorizeFolder(f, Constants.Policy.And.ADMIN);
                 foreach (var p in allowAnnonymousPages)
                     options.Conventions.AllowAnonymousToPage(p);
             });

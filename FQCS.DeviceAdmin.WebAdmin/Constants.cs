@@ -8,6 +8,17 @@ namespace FQCS.DeviceAdmin.WebAdmin
     public static class Constants
     {
 
+        public static class Policy
+        {
+            public static class And
+            {
+                public const string ADMIN = "And.Admin";
+            }
+            public static class Or
+            {
+                public const string ADMIN = "Or.Admin";
+            }
+        }
         public static class Routing
         {
             public const string DASHBOARD = "/dashboard";
