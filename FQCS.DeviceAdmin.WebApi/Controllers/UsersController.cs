@@ -18,6 +18,8 @@ using FQCS.DeviceAdmin.Data.Helpers;
 using FQCS.DeviceAdmin.Data.Models;
 using TNT.Core.Helpers.DI;
 using TNT.Core.Http.DI;
+using FQCS.DeviceAdmin.Business.Queries;
+using Microsoft.EntityFrameworkCore;
 
 namespace FQCS.DeviceAdmin.WebApi.Controllers
 {
@@ -107,6 +109,77 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             if (options.single_only && result == null)
                 return NotFound(AppResult.NotFound());
             return Ok(AppResult.Success(result));
+        }
+
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
+        [HttpPost("")]
+        public async Task<IActionResult> Create(CreateAppUserModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var validationData = _service.ValidateCreateAppUser(User, model);
+                if (!validationData.IsValid)
+                    return BadRequest(AppResult.FailValidation(data: validationData));
+                IdentityResult result;
+                using (var trans = context.Database.BeginTransaction())
+                {
+                    var entity = _service.ConvertToUser(model);
+                    result = await _service
+                        .CreateUserWithRolesTransactionAsync(entity, model.Password, new[] { model.Role });
+                    if (result.Succeeded)
+                    {
+                        trans.Commit();
+                        _logger.CustomProperties(entity).Info("Register new user");
+                        return Created($"/{Business.Constants.ApiEndpoint.USER_API}?id={entity.Id}",
+                            AppResult.Success(entity.Id));
+                    }
+                }
+                foreach (var err in result.Errors)
+                    ModelState.AddModelError(err.Code, err.Description);
+            }
+            var appResult = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
+            return BadRequest(appResult);
+        }
+
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update(string id, UpdateAppUserModel model)
+        {
+            var entity = _service.Users.Id(id).FirstOrDefault();
+            if (entity == null)
+                return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateUpdateAppUser(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            _service.UpdateAppUser(entity, model);
+            context.SaveChanges();
+            var result = await _service.UpdatePasswordIfAvailable(entity, model);
+            if (!result.Succeeded)
+                throw new Exception("Error change password");
+            return NoContent();
+        }
+
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            try
+            {
+                var entity = _service.Users.Id(id).FirstOrDefault();
+                if (entity == null)
+                    return NotFound(AppResult.NotFound());
+                var validationData = _service.ValidateDeleteAppUser(User, entity);
+                if (!validationData.IsValid)
+                    return BadRequest(AppResult.FailValidation(data: validationData));
+                _service.DeleteAppUser(entity);
+                context.SaveChanges();
+                return NoContent();
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.Error(e);
+                return BadRequest(AppResult.DependencyDeleteFail());
+            }
         }
 
         [HttpGet("token-info")]

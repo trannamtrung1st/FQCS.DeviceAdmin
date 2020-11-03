@@ -15,6 +15,7 @@ using FQCS.DeviceAdmin.Business.Queries;
 using FQCS.DeviceAdmin.Data;
 using FQCS.DeviceAdmin.Data.Models;
 using TNT.Core.Helpers.DI;
+using static FQCS.DeviceAdmin.Business.Constants;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
@@ -207,6 +208,12 @@ namespace FQCS.DeviceAdmin.Business.Services
         public AppUser ConvertToUser(RegisterModel model)
         {
             var entity = new AppUser { UserName = model.username, FullName = model.full_name };
+            return entity;
+        }
+
+        public AppUser ConvertToUser(CreateAppUserModel model)
+        {
+            var entity = new AppUser { UserName = model.UserName, FullName = model.FullName };
             return entity;
         }
 
@@ -495,6 +502,45 @@ namespace FQCS.DeviceAdmin.Business.Services
         }
         #endregion
 
+        #region Create AppUser
+        public AppUser CreateAppUser(CreateAppUserModel model)
+        {
+            var entity = model.ToDest();
+            PrepareCreate(entity);
+            return context.Users.Add(entity).Entity;
+        }
+        #endregion
+
+        #region Update AppUser
+        public void PrepareUpdate(AppUser entity)
+        {
+        }
+
+        public void UpdateAppUser(AppUser entity, UpdateAppUserModel model)
+        {
+            model.CopyTo(entity);
+            PrepareUpdate(entity);
+        }
+
+        public async Task<IdentityResult> UpdatePasswordIfAvailable(AppUser entity, UpdateAppUserModel model)
+        {
+            if (!string.IsNullOrWhiteSpace(model.PasswordReset))
+            {
+                var resetPassToken = await _userManager.GeneratePasswordResetTokenAsync(entity);
+                var result = await _userManager.ResetPasswordAsync(entity, resetPassToken, model.PasswordReset);
+                return result;
+            }
+            return null;
+        }
+        #endregion
+
+        #region Delete AppUser
+        public AppUser DeleteAppUser(AppUser entity)
+        {
+            return context.Users.Remove(entity).Entity;
+        }
+        #endregion
+
         #region Validation
         public bool IsValidAppClientScheme(string authHeader)
         {
@@ -524,6 +570,29 @@ namespace FQCS.DeviceAdmin.Business.Services
             AppUserQueryProjection projection,
             AppUserQueryPaging paging,
             AppUserQueryOptions options)
+        {
+            return new ValidationData();
+        }
+
+
+        public ValidationData ValidateCreateAppUser(ClaimsPrincipal principal,
+            CreateAppUserModel model)
+        {
+            return new ValidationData();
+        }
+
+        public ValidationData ValidateUpdateAppUser(ClaimsPrincipal principal,
+            AppUser entity, UpdateAppUserModel model)
+        {
+            var validationData = new ValidationData();
+            if (entity.UserRoles.First().Role.Name == Data.Constants.RoleName.ADMIN
+                && principal.Identity.Name != entity.Id)
+                validationData = validationData.Fail(code: AppResultCode.AccessDenied);
+            return validationData;
+        }
+
+        public ValidationData ValidateDeleteAppUser(ClaimsPrincipal principal,
+            AppUser entity)
         {
             return new ValidationData();
         }

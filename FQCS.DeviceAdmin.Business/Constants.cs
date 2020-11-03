@@ -33,7 +33,9 @@ namespace FQCS.DeviceAdmin.Business
             [Display(Name = "Unauthorized")]
             Unauthorized = 7,
             [Display(Name = "Username has already existed")]
-            DuplicatedUsername = 8
+            DuplicatedUsername = 8,
+            [Display(Name = "Access denied")]
+            AccessDenied = 9,
 
         }
 
