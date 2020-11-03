@@ -157,6 +157,25 @@ namespace FQCS.DeviceAdmin.Business.Services
             return result;
         }
 
+        public IQueryable<QCEvent> GetQueryableQCEventForUpdate(
+            QCEventQueryOptions options,
+            QCEventQueryFilter filter = null,
+            QCEventQuerySort sort = null,
+            QCEventQueryPaging paging = null)
+        {
+            var query = QCEvents;
+            if (filter != null) query = query.Filter(filter);
+            if (!options.single_only)
+            {
+                if (paging != null && (!options.load_all || !QCEventQueryOptions.IsLoadAllAllowed))
+                {
+                    if (sort != null) query = query.Sort(sort);
+                    query = query.SelectPage(paging.page, paging.limit);
+                }
+            }
+            return query;
+        }
+
         public IQueryable<QCEvent> GetQueryableQCEvent(
             QCEventQueryOptions options,
             QCEventQueryFilter filter = null,

@@ -64,9 +64,9 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 User, filter, sort, paging, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var query = _service.GetQueryableQCEvent(options, filter, sort, paging);
-            var updated = _service.UpdateEventsSentStatus(query, true);
+            var query = _service.GetQueryableQCEventForUpdate(options, filter, sort, paging);
             var updatedIds = query.Select(o => o.Id).ToList();
+            var updated = _service.UpdateEventsSentStatus(query, true);
             foreach (var id in updatedIds)
                 QCEvent.CheckedEvents.Remove(id);
             return Ok(AppResult.Success(updated));
