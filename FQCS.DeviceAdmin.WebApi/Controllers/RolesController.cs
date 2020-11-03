@@ -31,7 +31,11 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             var validationData = _service.ValidateGetRoles(User);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var result = _service.Roles.ToList();
+            var result = _service.Roles.Select(o => new
+            {
+                id = o.Id,
+                name = o.Name
+            }).ToList();
             return Ok(AppResult.Success(result));
         }
 
