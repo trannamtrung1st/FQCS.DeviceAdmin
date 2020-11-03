@@ -13,5 +13,7 @@ namespace FQCS.DeviceAdmin.Data.Models
 
         public string FullName { get; set; }
         public bool Disabled { get; set; }
+
+        public virtual IList<AppUserRole> UserRoles { get; set; }
     }
 }

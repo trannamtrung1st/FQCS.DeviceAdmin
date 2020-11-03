@@ -8,6 +8,42 @@ using FQCS.DeviceAdmin.Data.Models;
 
 namespace FQCS.DeviceAdmin.Business.Models
 {
+    public class CreateAppUserModel : MappingModel<AppUser>
+    {
+        public CreateAppUserModel()
+        {
+        }
+
+        public CreateAppUserModel(AppUser src) : base(src)
+        {
+        }
+
+        [JsonProperty("password")]
+        public string Password { get; set; }
+        [JsonProperty("username")]
+        public string UserName { get; set; }
+        [JsonProperty("full_name")]
+        public string FullName { get; set; }
+        [JsonProperty("role")]
+        public string Role { get; set; }
+    }
+
+    public class UpdateAppUserModel : MappingModel<AppUser>
+    {
+        public UpdateAppUserModel()
+        {
+        }
+
+        public UpdateAppUserModel(AppUser src) : base(src)
+        {
+        }
+
+        [JsonProperty("password_reset")]
+        public string PasswordReset { get; set; }
+        [JsonProperty("full_name")]
+        public string FullName { get; set; }
+    }
+
     public class TokenInfo
     {
         [JsonProperty("user_id")]
@@ -146,9 +182,12 @@ namespace FQCS.DeviceAdmin.Business.Models
         //---------------------------------------
 
         public const string INFO = "info";
+        public const string SELECT = "select";
+        public const string ROLE = "role";
 
         public static readonly IDictionary<string, string[]> MAPS = new Dictionary<string, string[]>
         {
+            { ROLE, new[]{ nameof(AppUser.UserRoles) } }
         };
     }
 

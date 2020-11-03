@@ -5,9 +5,9 @@ using System.Text;
 
 namespace FQCS.DeviceAdmin.Data.Models
 {
-    public class AppRole : IdentityRole<string>
+    public class AppUserRole : IdentityUserRole<string>
     {
-
-        public virtual IList<AppUserRole> UserRoles { get; set; }
+        public virtual AppUser User { get; set; }
+        public virtual AppRole Role { get; set; }
     }
 }

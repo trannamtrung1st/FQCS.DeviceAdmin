@@ -129,7 +129,8 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(data));
         }
 
-        [HttpPost("")]
+#if DEBUG
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm]RegisterModel model)
         {
             if (ModelState.IsValid)
@@ -157,7 +158,6 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return BadRequest(appResult);
         }
 
-#if DEBUG
         #region Administration
         [HttpPost("role")]
         public async Task<IActionResult> AddRole(AddRolesToUserModel model)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -9,7 +10,8 @@ using static FQCS.DeviceAdmin.Data.Constants;
 
 namespace FQCS.DeviceAdmin.Data.Models
 {
-    public partial class DataContext : IdentityDbContext<AppUser, AppRole, string>
+    public partial class DataContext : IdentityDbContext<AppUser, AppRole, string, IdentityUserClaim<string>,
+        AppUserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public DataContext()
         {
@@ -64,6 +66,15 @@ namespace FQCS.DeviceAdmin.Data.Models
                     Name = Constants.RoleName.DEVICE,
                     NormalizedName = Constants.RoleName.DEVICE.ToUpper()
                 });
+            });
+            modelBuilder.Entity<AppUserRole>(entity =>
+            {
+                entity.HasOne(e => e.User)
+                    .WithMany(e => e.UserRoles)
+                    .HasForeignKey(e => e.UserId);
+                entity.HasOne(e => e.Role)
+                    .WithMany(e => e.UserRoles)
+                    .HasForeignKey(e => e.RoleId);
             });
             modelBuilder.Entity<Resource>(entity =>
             {
