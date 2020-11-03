@@ -15,6 +15,9 @@ namespace FQCS.DeviceAdmin.WebAdmin
             public const string LOGOUT = "/identity/logout";
             public const string REGISTER = "/identity/register";
             public const string IDENTITY = "/identity";
+            public const string APP_USER = "/appuser";
+            public const string APP_USER_CREATE = "/appuser/create";
+            public const string APP_USER_DETAIL = "/appuser/{id}";
             public const string RESOURCE = "/resource";
             public const string RESOURCE_CREATE = "/resource/create";
             public const string RESOURCE_DETAIL = "/resource/{id}";
@@ -57,6 +60,7 @@ namespace FQCS.DeviceAdmin.WebAdmin
             public const string APP_CLIENT = "app_client";
             public const string DEVICE_CONFIG = "device_config";
             public const string QC_EVENT = "qc_event";
+            public const string APP_USER = "app_user";
             public const string ADMIN_ONLY = "admin_only";
         }
     }

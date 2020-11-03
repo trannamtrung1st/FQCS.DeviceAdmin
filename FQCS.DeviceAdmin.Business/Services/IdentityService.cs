@@ -73,6 +73,25 @@ namespace FQCS.DeviceAdmin.Business.Services
                             obj["full_name"] = entity.FullName;
                         }
                         break;
+                    case AppUserQueryProjection.SELECT:
+                        {
+                            var entity = row;
+                            obj["id"] = entity.Id;
+                            obj["username"] = entity.UserName;
+                            obj["full_name"] = entity.FullName;
+                        }
+                        break;
+                    case AppUserQueryProjection.ROLE:
+                        {
+                            var entity = row.UserRoles.FirstOrDefault()?.Role;
+                            if (entity != null)
+                                obj["role"] = new
+                                {
+                                    id = entity.Id,
+                                    name = entity.Name
+                                };
+                        }
+                        break;
                 }
             }
             return obj;
@@ -594,6 +613,8 @@ namespace FQCS.DeviceAdmin.Business.Services
         public ValidationData ValidateDeleteAppUser(ClaimsPrincipal principal,
             AppUser entity)
         {
+            if (entity.UserRoles.FirstOrDefault()?.Role.Name == Data.Constants.RoleName.ADMIN)
+                return new ValidationData().Fail(code: AppResultCode.AccessDenied);
             return new ValidationData();
         }
         #endregion

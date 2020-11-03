@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.Kafka", "F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scheduler", "Scheduler", "{A9C6F6D4-D78A-44E6-BDD6-23BDC528FCB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FQCS.DeviceAdmin.Scheduler", "FQCS.DeviceAdmin.Scheduler\FQCS.DeviceAdmin.Scheduler.csproj", "{88FB4AAF-22B2-4D27-8234-216ADC4C8CDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FQCS.DeviceAdmin.Scheduler", "FQCS.DeviceAdmin.Scheduler\FQCS.DeviceAdmin.Scheduler.csproj", "{88FB4AAF-22B2-4D27-8234-216ADC4C8CDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
