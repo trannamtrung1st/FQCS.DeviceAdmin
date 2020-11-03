@@ -66,7 +66,7 @@ namespace FQCS.DeviceAdmin.Business.Services
             }
             var filePath = Path.Combine(folderPath, fileName);
             var absPath = Path.GetFullPath(filePath);
-            var relativePath = rootPath == null ? absPath : absPath.Replace(rootPath, "").Substring(1);
+            var relativePath = rootPath == null ? absPath : filePath.Replace(rootPath, "").Substring(1);
             return (relativePath, absPath);
         }
 
