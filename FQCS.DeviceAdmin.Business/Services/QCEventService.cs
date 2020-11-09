@@ -157,6 +157,27 @@ namespace FQCS.DeviceAdmin.Business.Services
             return result;
         }
 
+        public IQueryable<QCEvent> QueryQCEvent(
+            QCEventQueryOptions options,
+            QCEventQueryFilter filter = null,
+            QCEventQuerySort sort = null,
+            QCEventQueryPaging paging = null)
+        {
+            var query = QCEvents;
+            #region General
+            if (filter != null) query = query.Filter(filter);
+            #endregion
+            if (!options.single_only)
+            {
+                #region List query
+                if (sort != null) query = query.Sort(sort);
+                if (paging != null && (!options.load_all || !QCEventQueryOptions.IsLoadAllAllowed))
+                    query = query.SelectPage(paging.page, paging.limit);
+                #endregion
+            }
+            return query;
+        }
+
         public IQueryable<QCEvent> GetQueryableQCEventForUpdate(
             QCEventQueryOptions options,
             QCEventQueryFilter filter = null,
@@ -335,6 +356,17 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
             return new ValidationData();
         }
+
+        public ValidationData ValidateCountQCEvents(
+            ClaimsPrincipal principal,
+            QCEventQueryFilter filter,
+            QCEventQuerySort sort,
+            QCEventQueryPaging paging,
+            QCEventQueryOptions options)
+        {
+            return new ValidationData();
+        }
+
 
         public ValidationData ValidateCreateQCEvent(ClaimsPrincipal principal,
             CreateQCEventModel model)
