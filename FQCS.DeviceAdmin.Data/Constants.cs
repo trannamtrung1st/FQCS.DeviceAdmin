@@ -23,7 +23,7 @@ namespace FQCS.DeviceAdmin.Data
         public static class DefectTypeCode
         {
             public const string SIZE_MISMATCH = "SIZE_MISMATCH";
-            public const string COLOR_MISMATCH = "COLOR_MISMATCH ";
+            public const string COLOR_MISMATCH = "COLOR_MISMATCH";
             public const string SAMPLE_MISMATCH = "SAMPLE_MISMATCH";
             public const string EXCESS_GLUE = "EXCESS_GLUE";
             public const string WEEK_DEGUMMING = "WEEK_DEGUMMING";

@@ -291,6 +291,8 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
             var entity = model.ToDest();
             entity.CreatedTime = createdTime;
+            entity.SideImages = model.SideImages == null ? null :
+                JsonConvert.SerializeObject(model.SideImages);
             PrepareCreate(entity);
             return context.QCEvent.Add(entity).Entity;
         }

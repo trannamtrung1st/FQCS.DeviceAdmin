@@ -172,10 +172,17 @@
                     },
                     {
                         targets: 4,
-                        data: "defect_type_code",
+                        data: "details",
                         orderable: true,
                         render: function (data, type, row, meta) {
-                            return data;
+                            let defects = [];
+                            if (data) {
+                                let count = data.length;
+                                for (let i = 0; i < count; i++) {
+                                    defects[i] = data[i].defect_type_code;
+                                }
+                            }
+                            return defects.join(', ');
                         }
                     },
                     {
