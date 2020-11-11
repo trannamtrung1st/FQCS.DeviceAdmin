@@ -382,18 +382,20 @@ namespace FQCS.DeviceAdmin.Business.Services
             if (properties.IssuedUtc != null)
                 resp.issued_utc = properties.IssuedUtc?.ToString("yyyy-MM-ddTHH:mm:ssZ");
             #region Handle scope
+            resp.roles = identity.FindAll(identity.RoleClaimType)
+                                .Select(c => c.Value).ToList();
             if (scope != null)
             {
                 var scopes = scope.Split(' ');
                 foreach (var s in scopes)
                 {
-                    switch (s)
-                    {
-                        case Constants.AppOAuthScope.ROLES:
-                            resp.roles = identity.FindAll(identity.RoleClaimType)
-                                .Select(c => c.Value).ToList();
-                            break;
-                    }
+                    //switch (s)
+                    //{
+                    //    case Constants.AppOAuthScope.ROLES:
+                    //        resp.roles = identity.FindAll(identity.RoleClaimType)
+                    //            .Select(c => c.Value).ToList();
+                    //        break;
+                    //}
                 }
             }
             #endregion
