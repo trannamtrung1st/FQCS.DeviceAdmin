@@ -104,11 +104,17 @@
             $('#form-main').validate({
                 submitHandler: confirmSubmit,
                 rules: {
+                    client_name: {
+                        required: true,
+                    },
                     secret_key: {
                         required: true,
                     },
                 },
                 messages: {
+                    client_name: {
+                        required: "Client name required",
+                    },
                     secret_key: {
                         required: "Client secret required",
                     },

@@ -176,6 +176,8 @@ namespace FQCS.DeviceAdmin.Business.Services
                 validationData = validationData.Fail("Client name must not be null", code: Constants.AppResultCode.FailValidation);
             if (string.IsNullOrWhiteSpace(model.Id))
                 validationData = validationData.Fail("Client ID must not be null", code: Constants.AppResultCode.FailValidation);
+            else if (AppClients.Exists(model.Id))
+                validationData = validationData.Fail("Client ID existed", code: Constants.AppResultCode.FailValidation);
             if (string.IsNullOrWhiteSpace(model.SecretKey))
                 validationData = validationData.Fail("Client secret must not be null", code: Constants.AppResultCode.FailValidation);
             return validationData;

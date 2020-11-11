@@ -99,6 +99,9 @@
             $('#form-main').validate({
                 submitHandler: confirmSubmit,
                 rules: {
+                    password_reset: {
+                        min: 6
+                    }
                 },
                 messages: {
                 },
