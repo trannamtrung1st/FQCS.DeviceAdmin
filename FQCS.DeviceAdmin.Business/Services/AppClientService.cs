@@ -171,13 +171,25 @@ namespace FQCS.DeviceAdmin.Business.Services
         public ValidationData ValidateCreateAppClient(ClaimsPrincipal principal,
             CreateAppClientModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.ClientName))
+                validationData = validationData.Fail("Client name must not be null", code: Constants.AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.Id))
+                validationData = validationData.Fail("Client ID must not be null", code: Constants.AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.SecretKey))
+                validationData = validationData.Fail("Client secret must not be null", code: Constants.AppResultCode.FailValidation);
+            return validationData;
         }
 
         public ValidationData ValidateUpdateAppClient(ClaimsPrincipal principal,
             AppClient entity, UpdateAppClientModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.ClientName))
+                validationData = validationData.Fail("Client name must not be null", code: Constants.AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.SecretKey))
+                validationData = validationData.Fail("Client secret must not be null", code: Constants.AppResultCode.FailValidation);
+            return validationData;
         }
 
         public ValidationData ValidateDeleteAppClient(ClaimsPrincipal principal,

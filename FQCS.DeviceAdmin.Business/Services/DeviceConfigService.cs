@@ -224,19 +224,32 @@ namespace FQCS.DeviceAdmin.Business.Services
         public ValidationData ValidateCreateDeviceConfig(ClaimsPrincipal principal,
             CreateDeviceConfigModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Identifier))
+                validationData = validationData.Fail("ID must not be null", code: Constants.AppResultCode.FailValidation);
+            if ((!string.IsNullOrWhiteSpace(model.KafkaUsername) || !string.IsNullOrWhiteSpace(model.KafkaPassword))
+                && string.IsNullOrWhiteSpace(model.KafkaServer))
+                validationData = validationData.Fail("Kafka server info missed", code: Constants.AppResultCode.FailValidation);
+            return validationData;
         }
 
         public ValidationData ValidateUpdateDeviceConfig(ClaimsPrincipal principal,
             DeviceConfig entity, UpdateDeviceConfigModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Identifier))
+                validationData = validationData.Fail("ID must not be null", code: Constants.AppResultCode.FailValidation);
+            if ((!string.IsNullOrWhiteSpace(model.KafkaUsername) || !string.IsNullOrWhiteSpace(model.KafkaPasswordReset))
+                && string.IsNullOrWhiteSpace(model.KafkaServer))
+                validationData = validationData.Fail("Kafka server info missed", code: Constants.AppResultCode.FailValidation);
+            return validationData;
         }
 
         public ValidationData ValidateChangeCurrentDeviceConfig(ClaimsPrincipal principal,
             DeviceConfig entity, ChangeCurrentDeviceConfigModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            return validationData;
         }
 
         public ValidationData ValidateDeleteDeviceConfig(ClaimsPrincipal principal,

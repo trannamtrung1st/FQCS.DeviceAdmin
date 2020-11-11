@@ -597,7 +597,14 @@ namespace FQCS.DeviceAdmin.Business.Services
         public ValidationData ValidateCreateAppUser(ClaimsPrincipal principal,
             CreateAppUserModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Role)
+                || !Data.Constants.RoleName.ALL.Contains(model.Role))
+                validationData = validationData.Fail("Invalid role", code: Constants.AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.UserName) || string.IsNullOrWhiteSpace(model.Password)
+                || model.UserName.Length < 3 || model.Password.Length < 6)
+                validationData = validationData.Fail("Invalid username or password", code: Constants.AppResultCode.FailValidation);
+            return validationData;
         }
 
         public ValidationData ValidateUpdateAppUser(ClaimsPrincipal principal,
@@ -607,6 +614,8 @@ namespace FQCS.DeviceAdmin.Business.Services
             if (entity.UserRoles.First().Role.Name == Data.Constants.RoleName.ADMIN
                 && principal.Identity.Name != entity.Id)
                 validationData = validationData.Fail(code: AppResultCode.AccessDenied);
+            if (!string.IsNullOrWhiteSpace(model.PasswordReset) && model.PasswordReset.Length < 6)
+                validationData = validationData.Fail("Invalid password reset", code: Constants.AppResultCode.FailValidation);
             return validationData;
         }
 

@@ -148,6 +148,11 @@ namespace FQCS.DeviceAdmin.WebApi
                     policy.Requirements.Add(new AuthUserRequirement(isOR: false)));
                 options.AddPolicy(Constants.Policy.Or.AUTH_USER, policy =>
                     policy.Requirements.Add(new AuthUserRequirement(isOR: true)));
+
+                options.AddPolicy(Constants.Policy.And.ADMIN_USER, policy =>
+                    policy.Requirements.Add(new AuthUserRequirement(isOR: false, role: Data.Constants.RoleName.ADMIN)));
+                options.AddPolicy(Constants.Policy.Or.ADMIN_USER, policy =>
+                    policy.Requirements.Add(new AuthUserRequirement(isOR: true, role: Data.Constants.RoleName.ADMIN)));
             });
             services.AddScoped<IAuthorizationHandler, AppClientAuthHandler>();
             services.AddScoped<IAuthorizationHandler, AuthUserAuthHandler>();

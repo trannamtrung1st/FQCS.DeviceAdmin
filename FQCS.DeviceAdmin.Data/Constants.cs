@@ -17,6 +17,7 @@ namespace FQCS.DeviceAdmin.Data
         {
             public const string ADMIN = "Administrator";
             public const string DEVICE = "Device";
+            public static readonly string[] ALL = new[] { ADMIN, DEVICE };
         }
 
         public static class DefectTypeCode
@@ -27,6 +28,7 @@ namespace FQCS.DeviceAdmin.Data
             public const string EXCESS_GLUE = "EXCESS_GLUE";
             public const string WEEK_DEGUMMING = "WEEK_DEGUMMING";
             public const string STAIN = "STAIN";
+            public static readonly string[] ALL = new[] { SIZE_MISMATCH, COLOR_MISMATCH, SAMPLE_MISMATCH, EXCESS_GLUE, WEEK_DEGUMMING, STAIN };
         }
 
     }

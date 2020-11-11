@@ -8,8 +8,10 @@ namespace FQCS.DeviceAdmin.WebApi.Policies
 {
     public class AuthUserRequirement : LogicRequirement
     {
-        public AuthUserRequirement(bool isOR = false) : base(isOR)
+        public string Role { get; }
+        public AuthUserRequirement(bool isOR = false, string role = null) : base(isOR)
         {
+            Role = role;
         }
     }
 }

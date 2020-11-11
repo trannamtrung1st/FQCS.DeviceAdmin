@@ -45,7 +45,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(result));
         }
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpPost("")]
         public IActionResult Create(CreateDeviceConfigModel model)
         {
@@ -58,7 +58,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 AppResult.Success(entity.Id));
         }
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpPatch("{id}")]
         public IActionResult Update(int id, UpdateDeviceConfigModel model)
         {
@@ -75,7 +75,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return NoContent();
         }
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpPost("current")]
         public IActionResult ChangeCurrentDeviceConfig(ChangeCurrentDeviceConfigModel model)
         {
@@ -92,7 +92,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return NoContent();
         }
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

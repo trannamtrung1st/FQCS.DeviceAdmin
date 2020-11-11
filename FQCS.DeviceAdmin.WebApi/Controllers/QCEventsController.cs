@@ -34,7 +34,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
-        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpGet("")]
         public async Task<IActionResult> Get([FromQuery][QueryObject]QCEventQueryFilter filter,
             [FromQuery]QCEventQuerySort sort,
@@ -55,7 +55,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
 
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
-        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpGet("count")]
         public IActionResult Count([FromQuery][QueryObject]QCEventQueryFilter filter,
             [FromQuery]QCEventQuerySort sort,
@@ -73,7 +73,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
 
         [Authorize(Policy = Constants.Policy.And.APP_CLIENT)]
         [HttpPut("sent-status")]
-        public async Task<IActionResult> UpdateSentStatus([FromQuery][QueryObject]QCEventQueryFilter filter,
+        public IActionResult UpdateSentStatus([FromQuery][QueryObject]QCEventQueryFilter filter,
             [FromQuery]QCEventQuerySort sort,
             [FromQuery]QCEventQueryPaging paging,
             [FromQuery]QCEventQueryOptions options)
@@ -91,7 +91,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         }
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
-        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpGet("images")]
         public IActionResult GetAllImages()
         {
@@ -112,7 +112,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         }
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
-        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpPost("send-events")]
         public async Task<IActionResult> SendUnsentEvents()
         {
@@ -125,7 +125,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
 
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
-        [Authorize(Policy = Constants.Policy.Or.AUTH_USER)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpPost("clear")]
         public async Task<IActionResult> ClearAllEvents()
         {
@@ -138,14 +138,17 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(deleted));
         }
 
-        [Authorize]
+        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpPost("")]
         public IActionResult Create(CreateQCEventModel model)
         {
             var validationData = _service.ValidateCreateQCEvent(User, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var entity = _service.CreateQCEvent(model);
+            DateTime createdTime;
+            createdTime = validationData.GetTempData<DateTime>(nameof(createdTime));
+            var entity = _service.CreateQCEvent(model, createdTime);
             context.SaveChanges();
             if (Startup.KafkaProducer != null)
                 _service.ProduceEventToKafkaServer(Startup.KafkaProducer,

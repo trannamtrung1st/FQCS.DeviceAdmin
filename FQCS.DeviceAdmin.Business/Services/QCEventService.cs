@@ -264,11 +264,10 @@ namespace FQCS.DeviceAdmin.Business.Services
             });
         }
 
-        public QCEvent CreateQCEvent(CreateQCEventModel model)
+        public QCEvent CreateQCEvent(CreateQCEventModel model, DateTime createdTime)
         {
             var entity = model.ToDest();
-            entity.CreatedTime = DateTime.ParseExact(
-                model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture).ToUtc();
+            entity.CreatedTime = createdTime;
             PrepareCreate(entity);
             return context.QCEvent.Add(entity).Entity;
         }
@@ -371,7 +370,16 @@ namespace FQCS.DeviceAdmin.Business.Services
         public ValidationData ValidateCreateQCEvent(ClaimsPrincipal principal,
             CreateQCEventModel model)
         {
-            return new ValidationData();
+            var validationData = new ValidationData();
+            if (!Data.Constants.DefectTypeCode.ALL.Contains(model.DefectTypeCode))
+                validationData = validationData.Fail("Invalid defect type", code: Constants.AppResultCode.FailValidation);
+            DateTime createdTime;
+            if (!DateTime.TryParseExact(
+                model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture,
+                DateTimeStyles.AdjustToUniversal, out createdTime))
+                validationData = validationData.Fail("Client ID must not be null", code: Constants.AppResultCode.FailValidation);
+            else validationData.TempData[nameof(createdTime)] = createdTime;
+            return validationData;
         }
 
         public ValidationData ValidateDeleteQCEvent(ClaimsPrincipal principal,

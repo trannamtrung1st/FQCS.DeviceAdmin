@@ -13,11 +13,13 @@ namespace FQCS.DeviceAdmin.WebApi
             {
                 public const string APP_CLIENT = "And.AppClient";
                 public const string AUTH_USER = "And.AuthUser";
+                public const string ADMIN_USER = "Or.AdminUser";
             }
             public static class Or
             {
                 public const string APP_CLIENT = "Or.AppClient";
                 public const string AUTH_USER = "Or.AuthUser";
+                public const string ADMIN_USER = "Or.AdminUser";
             }
         }
 

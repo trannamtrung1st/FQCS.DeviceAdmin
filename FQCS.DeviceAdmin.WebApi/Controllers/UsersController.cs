@@ -93,6 +93,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         }
         #endregion
 
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpGet("")]
         public async Task<IActionResult> Get([FromQuery][QueryObject]AppUserQueryFilter filter,
             [FromQuery]AppUserQuerySort sort,

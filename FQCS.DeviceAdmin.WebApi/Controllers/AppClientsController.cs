@@ -28,7 +28,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         private readonly IdentityService _identityService;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpGet("")]
         public async Task<IActionResult> Get([FromQuery][QueryObject]AppClientQueryFilter filter,
             [FromQuery]AppClientQuerySort sort,
@@ -69,7 +69,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
         }
 #endif
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpPost("")]
         public IActionResult Create(CreateAppClientModel model)
         {
@@ -82,7 +82,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 AppResult.Success(entity.Id));
         }
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpPatch("{id}")]
         public IActionResult Update(string id, UpdateAppClientModel model)
         {
@@ -97,7 +97,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return NoContent();
         }
 
-        [Authorize]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

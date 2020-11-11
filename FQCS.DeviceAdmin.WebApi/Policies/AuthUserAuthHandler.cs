@@ -22,7 +22,8 @@ namespace FQCS.DeviceAdmin.WebApi.Policies
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
                                                        AuthUserRequirement requirement)
         {
-            if (context.User.Identity.IsAuthenticated)
+            if (context.User.Identity.IsAuthenticated &&
+                (requirement.Role == null || context.User.IsInRole(requirement.Role)))
             {
                 context.Succeed(requirement);
                 SucceedORRequirement(context);
