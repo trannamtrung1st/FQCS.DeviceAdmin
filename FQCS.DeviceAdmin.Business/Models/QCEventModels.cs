@@ -12,9 +12,6 @@ namespace FQCS.DeviceAdmin.Business.Models
     {
         [JsonProperty("id")]
         public string Id { get; set; }
-        // this is code from QC device
-        [JsonProperty("qc_defect_code")]
-        public string QCDefectCode { get; set; }
         [JsonProperty("created_time")]
         public DateTime CreatedTime { get; set; }
         [JsonProperty("identifier")]
@@ -23,6 +20,19 @@ namespace FQCS.DeviceAdmin.Business.Models
         public string LeftB64Image { get; set; }
         [JsonProperty("right_b64_image")]
         public string RightB64Image { get; set; }
+        [JsonProperty("side_b64_images")]
+        public IEnumerable<string> SideB64Images { get; set; }
+        [JsonProperty("details")]
+        public IEnumerable<QCEventDetailMessage> Details { get; set; }
+    }
+
+    public class QCEventDetailMessage
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+        // this is code from QC device
+        [JsonProperty("qc_defect_code")]
+        public string QCDefectCode { get; set; }
     }
 
     public class CreateQCEventModel : MappingModel<QCEvent>
@@ -35,8 +45,6 @@ namespace FQCS.DeviceAdmin.Business.Models
         {
         }
 
-        [JsonProperty("defect_type_code")]
-        public string DefectTypeCode { get; set; }
         [JsonProperty("created_time_str")]
         public string CreatedTimeStr { get; set; }
         [JsonProperty("date_format")]
@@ -45,6 +53,26 @@ namespace FQCS.DeviceAdmin.Business.Models
         public string LeftImage { get; set; }
         [JsonProperty("right_image")]
         public string RightImage { get; set; }
+        [JsonProperty("side_images")]
+        public IEnumerable<string> SideImages { get; set; }
+
+        [JsonProperty("details")]
+        public IEnumerable<CreateQCEventDetailModel> Details { get; set; }
+    }
+
+    public class CreateQCEventDetailModel : MappingModel<QCEventDetail>
+    {
+        public CreateQCEventDetailModel()
+        {
+        }
+
+        public CreateQCEventDetailModel(QCEventDetail src) : base(src)
+        {
+        }
+
+        [JsonProperty("defect_type_code")]
+        public string DefectTypeCode { get; set; }
+
     }
 
     #region Query
@@ -82,6 +110,7 @@ namespace FQCS.DeviceAdmin.Business.Models
 
         public static readonly IDictionary<string, string[]> MAPS = new Dictionary<string, string[]>
         {
+            { INFO, new[]{ nameof(QCEvent.Details) } }
         };
     }
 

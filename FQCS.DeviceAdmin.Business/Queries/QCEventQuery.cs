@@ -69,7 +69,7 @@ namespace FQCS.DeviceAdmin.Business.Queries
             if (filter.id != null)
                 query = query.Where(o => o.Id == filter.id);
             if (filter.defect_type != null)
-                query = query.Where(o => o.DefectTypeCode == filter.defect_type);
+                query = query.Where(o => o.Details.Any(e => e.DefectTypeCode == filter.defect_type));
             if (filter.from_time != null)
                 query = query.Where(o => o.CreatedTime >= filter.from_time);
             if (filter.to_time != null)

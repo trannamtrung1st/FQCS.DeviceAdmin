@@ -3,6 +3,7 @@ using FQCS.DeviceAdmin.Business.Models;
 using FQCS.DeviceAdmin.Business.Queries;
 using FQCS.DeviceAdmin.Business.Services;
 using FQCS.DeviceAdmin.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using System;
@@ -27,7 +28,8 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             provider = scope.ServiceProvider;
             var dContext = provider.GetRequiredService<DataContext>();
             var qcEventService = provider.GetRequiredService<QCEventService>();
-            var entities = qcEventService.QCEvents.Unsent().ToList();
+            var entities = qcEventService.QCEvents.Include(o => o.Details).Unsent()
+                .ToList();
             foreach (var entity in entities)
             {
                 if (scheduler.KafkaProducer != null && !QCEvent.CheckedEvents.Contains(entity.Id))

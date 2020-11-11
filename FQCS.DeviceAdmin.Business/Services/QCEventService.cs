@@ -47,10 +47,17 @@ namespace FQCS.DeviceAdmin.Business.Services
                         {
                             var entity = row;
                             obj["id"] = entity.Id;
-                            obj["defect_type_code"] = entity.DefectTypeCode;
+                            var details = entity.Details.Select(o => new
+                            {
+                                id = o.Id,
+                                defect_type_code = o.DefectTypeCode,
+                            }).ToList();
+                            obj["details"] = details;
                             obj["noti_sent"] = entity.NotiSent;
                             obj["left_image"] = entity.LeftImage;
                             obj["right_image"] = entity.RightImage;
+                            obj["side_images"] = entity.SideImages == null ? null :
+                                JsonConvert.DeserializeObject<IEnumerable<string>>(entity.SideImages);
                             var time = entity.CreatedTime
                                 .ToDefaultTimeZone();
                             var timeStr = time.ToString(options.date_format);
@@ -92,6 +99,22 @@ namespace FQCS.DeviceAdmin.Business.Services
                                     var img = File.ReadAllBytes(fullPath);
                                     var img64 = Convert.ToBase64String(img);
                                     obj["right_image_64"] = img64;
+                                }
+                            }
+                            if (entity.SideImages != null)
+                            {
+                                var sideImages = JsonConvert.DeserializeObject<IEnumerable<string>>(entity.SideImages);
+                                var sideImagesB64 = new List<string>();
+                                obj["side_images_b64"] = sideImagesB64;
+                                foreach (var iPath in sideImages)
+                                {
+                                    var fullPath = fileService.GetFilePath(folderPath, null, iPath).Item2;
+                                    if (File.Exists(fullPath))
+                                    {
+                                        var img = File.ReadAllBytes(fullPath);
+                                        var img64 = Convert.ToBase64String(img);
+                                        sideImagesB64.Add(img64);
+                                    }
                                 }
                             }
                         }
@@ -157,27 +180,6 @@ namespace FQCS.DeviceAdmin.Business.Services
             return result;
         }
 
-        public IQueryable<QCEvent> QueryQCEvent(
-            QCEventQueryOptions options,
-            QCEventQueryFilter filter = null,
-            QCEventQuerySort sort = null,
-            QCEventQueryPaging paging = null)
-        {
-            var query = QCEvents;
-            #region General
-            if (filter != null) query = query.Filter(filter);
-            #endregion
-            if (!options.single_only)
-            {
-                #region List query
-                if (sort != null) query = query.Sort(sort);
-                if (paging != null && (!options.load_all || !QCEventQueryOptions.IsLoadAllAllowed))
-                    query = query.SelectPage(paging.page, paging.limit);
-                #endregion
-            }
-            return query;
-        }
-
         public IQueryable<QCEvent> GetQueryableQCEventForUpdate(
             QCEventQueryOptions options,
             QCEventQueryFilter filter = null,
@@ -220,13 +222,15 @@ namespace FQCS.DeviceAdmin.Business.Services
         {
             entity.Id = Guid.NewGuid().ToString();
             entity.LastUpdated = DateTime.UtcNow;
+            foreach (var e in entity.Details)
+                e.Id = Guid.NewGuid().ToString();
         }
 
         public void ProduceEventToKafkaServer(IProducer<Null, string> producer, QCEvent entity,
             DeviceConfig currentConfig, string dataFolder, string connStr)
         {
             var mess = new Message<Null, string>();
-            string leftImgB64 = null; string rightImgB64 = null;
+            string leftImgB64 = null; string rightImgB64 = null; List<string> sideImagesB64 = null;
             var imgPath = Path.Combine(dataFolder, entity.LeftImage);
             if (File.Exists(imgPath))
             {
@@ -239,14 +243,33 @@ namespace FQCS.DeviceAdmin.Business.Services
                 var img = File.ReadAllBytes(imgPath);
                 rightImgB64 = Convert.ToBase64String(img);
             }
+            var sideImages = entity.SideImages == null ? null :
+                JsonConvert.DeserializeObject<IEnumerable<string>>(entity.SideImages);
+            if (sideImages != null)
+            {
+                sideImagesB64 = new List<string>();
+                foreach (var iPath in sideImages)
+                    if (File.Exists(iPath))
+                    {
+                        var img = File.ReadAllBytes(iPath);
+                        var b64 = Convert.ToBase64String(img);
+                        sideImagesB64.Add(b64);
+                    }
+            }
+            var details = entity.Details.Select(o => new QCEventDetailMessage
+            {
+                Id = o.Id,
+                QCDefectCode = o.DefectTypeCode
+            }).ToList();
             mess.Value = JsonConvert.SerializeObject(new QCEventMessage
             {
                 Id = entity.Id,
                 CreatedTime = entity.CreatedTime,
-                QCDefectCode = entity.DefectTypeCode,
                 Identifier = currentConfig.Identifier,
                 LeftB64Image = leftImgB64,
                 RightB64Image = rightImgB64,
+                SideB64Images = sideImagesB64,
+                Details = details
             });
             QCEvent.CheckedEvents.Add(entity.Id);
             producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess, report =>
@@ -371,8 +394,10 @@ namespace FQCS.DeviceAdmin.Business.Services
             CreateQCEventModel model)
         {
             var validationData = new ValidationData();
-            if (!Data.Constants.DefectTypeCode.ALL.Contains(model.DefectTypeCode))
-                validationData = validationData.Fail("Invalid defect type", code: Constants.AppResultCode.FailValidation);
+            foreach (var d in model.Details)
+                if (!Data.Constants.DefectTypeCode.ALL.Contains(d.DefectTypeCode))
+                    validationData = validationData.Fail("Invalid defect type",
+                        code: Constants.AppResultCode.FailValidation);
             DateTime createdTime;
             if (!DateTime.TryParseExact(
                 model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture,

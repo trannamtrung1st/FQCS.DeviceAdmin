@@ -66,7 +66,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 User, filter, sort, paging, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var query = _service.QueryQCEvent(options, filter, sort, paging);
+            var query = _service.GetQueryableQCEvent(options, filter, sort, paging);
             var count = query.Count();
             return Ok(AppResult.Success(count));
         }

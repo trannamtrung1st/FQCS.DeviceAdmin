@@ -76,7 +76,11 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     KafkaPassword = table.Column<string>(maxLength: 2000, nullable: true),
                     CreatedTime = table.Column<DateTime>(nullable: false),
                     LastUpdated = table.Column<DateTime>(nullable: false),
-                    IsCurrent = table.Column<bool>(nullable: false)
+                    IsCurrent = table.Column<bool>(nullable: false),
+                    RemoveOldEventsJobSettings = table.Column<string>(nullable: true),
+                    NextROEJobStart = table.Column<DateTime>(nullable: true),
+                    SendUnsentEventsJobSettings = table.Column<string>(nullable: true),
+                    NextSUEJobStart = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -88,11 +92,11 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(unicode: false, maxLength: 255, nullable: false),
-                    DefectTypeCode = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
                     LastUpdated = table.Column<DateTime>(nullable: false),
                     CreatedTime = table.Column<DateTime>(nullable: false),
                     LeftImage = table.Column<string>(unicode: false, maxLength: 2000, nullable: true),
                     RightImage = table.Column<string>(unicode: false, maxLength: 2000, nullable: true),
+                    SideImages = table.Column<string>(unicode: false, maxLength: 2000, nullable: true),
                     NotiSent = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -219,15 +223,34 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "aa477b03-420d-41ab-b2ce-9ebcc4fa833b", "fb3af46c-987e-44ce-b013-51f5475f7a20", "Administrator", "ADMINISTRATOR" });
+            migrationBuilder.CreateTable(
+                name: "QCEventDetail",
+                columns: table => new
+                {
+                    Id = table.Column<string>(unicode: false, maxLength: 255, nullable: false),
+                    DefectTypeCode = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    EventId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QCEventDetail", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_QCEvent_QCEventDetail",
+                        column: x => x.EventId,
+                        principalTable: "QCEvent",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "46fc171e-a78c-4703-a482-8d1e01e839aa", "4944b781-fc9f-4b6a-8a6d-c93aab871cb7", "Device", "DEVICE" });
+                values: new object[] { "6ebf43c2-c2a4-4c0b-b692-66e9e8f67e29", "a7dae202-8d70-49f8-a97c-4fc03b204589", "Administrator", "ADMINISTRATOR" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "d86a759f-2d98-4da8-8dac-a6c0b1a93b0f", "9a897cd8-190e-4e1b-b846-84639209b373", "Device", "DEVICE" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -267,6 +290,11 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QCEventDetail_EventId",
+                table: "QCEventDetail",
+                column: "EventId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -293,7 +321,7 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                 name: "DeviceConfig");
 
             migrationBuilder.DropTable(
-                name: "QCEvent");
+                name: "QCEventDetail");
 
             migrationBuilder.DropTable(
                 name: "Resource");
@@ -303,6 +331,9 @@ namespace FQCS.DeviceAdmin.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "QCEvent");
         }
     }
 }

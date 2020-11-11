@@ -24,6 +24,7 @@ namespace FQCS.DeviceAdmin.Data.Models
 
         public virtual DbSet<Resource> Resource { get; set; }
         public virtual DbSet<QCEvent> QCEvent { get; set; }
+        public virtual DbSet<QCEventDetail> QCEventDetail { get; set; }
         public virtual DbSet<DeviceConfig> DeviceConfig { get; set; }
         public virtual DbSet<AppClient> AppClient { get; set; }
 
@@ -85,15 +86,30 @@ namespace FQCS.DeviceAdmin.Data.Models
                 entity.Property(e => e.Id)
                     .IsUnicode(false)
                     .HasMaxLength(255);
-                entity.Property(e => e.DefectTypeCode)
-                    .IsUnicode(false)
-                    .HasMaxLength(100);
                 entity.Property(e => e.LeftImage)
                     .IsUnicode(false)
                     .HasMaxLength(2000);
                 entity.Property(e => e.RightImage)
                     .IsUnicode(false)
                     .HasMaxLength(2000);
+                entity.Property(e => e.SideImages)
+                    .IsUnicode(false)
+                    .HasMaxLength(2000);
+            });
+            modelBuilder.Entity<QCEventDetail>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .IsUnicode(false)
+                    .HasMaxLength(255);
+                entity.Property(e => e.DefectTypeCode)
+                    .IsUnicode(false)
+                    .HasMaxLength(100);
+                entity.HasOne(e => e.Event)
+                    .WithMany(e => e.Details)
+                    .HasForeignKey(e => e.EventId)
+                    .IsRequired(true)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_QCEvent_QCEventDetail");
             });
             modelBuilder.Entity<DeviceConfig>(entity =>
             {

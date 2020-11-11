@@ -81,15 +81,15 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bb47a220-88f7-471b-a66b-2a77161169ff",
-                            ConcurrencyStamp = "49a295c1-35cd-4f8a-b9d6-3eab363b2858",
+                            Id = "6ebf43c2-c2a4-4c0b-b692-66e9e8f67e29",
+                            ConcurrencyStamp = "a7dae202-8d70-49f8-a97c-4fc03b204589",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "086c8298-a8a3-4c74-8654-4b8556603d5a",
-                            ConcurrencyStamp = "494416d7-0b4d-46cb-90b4-7750142e7ea4",
+                            Id = "d86a759f-2d98-4da8-8dac-a6c0b1a93b0f",
+                            ConcurrencyStamp = "9a897cd8-190e-4e1b-b846-84639209b373",
                             Name = "Device",
                             NormalizedName = "DEVICE"
                         });
@@ -168,6 +168,21 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.AppUserRole", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
             modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.DeviceConfig", b =>
                 {
                     b.Property<int>("Id")
@@ -228,11 +243,6 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DefectTypeCode")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
 
@@ -249,9 +259,37 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                         .HasMaxLength(2000)
                         .IsUnicode(false);
 
+                    b.Property<string>("SideImages")
+                        .HasColumnType("varchar(2000)")
+                        .HasMaxLength(2000)
+                        .IsUnicode(false);
+
                     b.HasKey("Id");
 
                     b.ToTable("QCEvent");
+                });
+
+            modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.QCEventDetail", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)")
+                        .HasMaxLength(255)
+                        .IsUnicode(false);
+
+                    b.Property<string>("DefectTypeCode")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("QCEventDetail");
                 });
 
             modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.Resource", b =>
@@ -340,21 +378,6 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
@@ -372,6 +395,31 @@ namespace FQCS.DeviceAdmin.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.AppUserRole", b =>
+                {
+                    b.HasOne("FQCS.DeviceAdmin.Data.Models.AppRole", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FQCS.DeviceAdmin.Data.Models.AppUser", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FQCS.DeviceAdmin.Data.Models.QCEventDetail", b =>
+                {
+                    b.HasOne("FQCS.DeviceAdmin.Data.Models.QCEvent", "Event")
+                        .WithMany("Details")
+                        .HasForeignKey("EventId")
+                        .HasConstraintName("FK_QCEvent_QCEventDetail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -394,21 +442,6 @@ namespace FQCS.DeviceAdmin.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("FQCS.DeviceAdmin.Data.Models.AppUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("FQCS.DeviceAdmin.Data.Models.AppRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("FQCS.DeviceAdmin.Data.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
