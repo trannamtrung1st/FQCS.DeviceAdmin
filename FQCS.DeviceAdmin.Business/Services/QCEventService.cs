@@ -249,12 +249,13 @@ namespace FQCS.DeviceAdmin.Business.Services
             {
                 sideImagesB64 = new List<string>();
                 foreach (var iPath in sideImages)
-                    if (File.Exists(iPath))
-                    {
-                        var img = File.ReadAllBytes(iPath);
-                        var b64 = Convert.ToBase64String(img);
-                        sideImagesB64.Add(b64);
-                    }
+                    imgPath = Path.Combine(dataFolder, iPath);
+                if (File.Exists(imgPath))
+                {
+                    var img = File.ReadAllBytes(imgPath);
+                    var b64 = Convert.ToBase64String(img);
+                    sideImagesB64.Add(b64);
+                }
             }
             var details = entity.Details.Select(o => new QCEventDetailMessage
             {
@@ -269,7 +270,11 @@ namespace FQCS.DeviceAdmin.Business.Services
                 LeftB64Image = leftImgB64,
                 RightB64Image = rightImgB64,
                 SideB64Images = sideImagesB64,
-                Details = details
+                Details = details,
+                LeftImage = entity.LeftImage,
+                RightImage = entity.RightImage,
+                SideImages = entity.SideImages == null ? null :
+                    JsonConvert.DeserializeObject<IList<string>>(entity.SideImages)
             });
             QCEvent.CheckedEvents.Add(entity.Id);
             producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess, report =>
