@@ -396,15 +396,16 @@ namespace FQCS.DeviceAdmin.Business.Services
             CreateQCEventModel model)
         {
             var validationData = new ValidationData();
-            foreach (var d in model.Details)
-                if (!Data.Constants.DefectTypeCode.ALL.Contains(d.DefectTypeCode))
-                    validationData = validationData.Fail("Invalid defect type",
-                        code: Constants.AppResultCode.FailValidation);
+            if (model.Details != null)
+                foreach (var d in model.Details)
+                    if (!Data.Constants.DefectTypeCode.ALL.Contains(d.DefectTypeCode))
+                        validationData = validationData.Fail("Invalid defect type",
+                            code: Constants.AppResultCode.FailValidation);
             DateTime createdTime;
             if (!DateTime.TryParseExact(
                 model.CreatedTimeStr, model.DateFormat, CultureInfo.InvariantCulture,
                 DateTimeStyles.AdjustToUniversal, out createdTime))
-                validationData = validationData.Fail("Client ID must not be null", code: Constants.AppResultCode.FailValidation);
+                validationData = validationData.Fail("Invalid datetime", code: Constants.AppResultCode.FailValidation);
             else validationData.TempData[nameof(createdTime)] = createdTime;
             return validationData;
         }
