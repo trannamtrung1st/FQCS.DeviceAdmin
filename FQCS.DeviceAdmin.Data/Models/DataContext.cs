@@ -95,6 +95,8 @@ namespace FQCS.DeviceAdmin.Data.Models
                 entity.Property(e => e.SideImages)
                     .IsUnicode(false)
                     .HasMaxLength(2000);
+                entity.Property(e => e.Seen)
+                    .HasDefaultValue(false);
             });
             modelBuilder.Entity<QCEventDetail>(entity =>
             {

@@ -54,6 +54,7 @@ namespace FQCS.DeviceAdmin.Business.Services
                             }).ToList();
                             obj["details"] = details;
                             obj["noti_sent"] = entity.NotiSent;
+                            obj["seen"] = entity.Seen;
                             obj["left_image"] = entity.LeftImage;
                             obj["right_image"] = entity.RightImage;
                             obj["side_images"] = entity.SideImages == null ? null :
@@ -309,6 +310,17 @@ namespace FQCS.DeviceAdmin.Business.Services
             entity.LastUpdated = DateTime.UtcNow;
         }
 
+        public int UpdateEventsSeenStatus(IQueryable<QCEvent> entities, bool val)
+        {
+            var updated = new QCEvent
+            {
+                Seen = val
+            };
+            PrepareUpdate(updated);
+            return entities.BatchUpdate(updated, new List<string> {
+                nameof(QCEvent.Seen), nameof(QCEvent.LastUpdated) });
+        }
+
         public int UpdateEventsSentStatus(IQueryable<QCEvent> entities, bool val)
         {
             var updated = new QCEvent
@@ -365,6 +377,16 @@ namespace FQCS.DeviceAdmin.Business.Services
         }
 
         public ValidationData ValidateUpdateSentStatus(
+            ClaimsPrincipal principal,
+            QCEventQueryFilter filter,
+            QCEventQuerySort sort,
+            QCEventQueryPaging paging,
+            QCEventQueryOptions options)
+        {
+            return new ValidationData();
+        }
+
+        public ValidationData ValidateUpdateSeenStatus(
             ClaimsPrincipal principal,
             QCEventQueryFilter filter,
             QCEventQuerySort sort,

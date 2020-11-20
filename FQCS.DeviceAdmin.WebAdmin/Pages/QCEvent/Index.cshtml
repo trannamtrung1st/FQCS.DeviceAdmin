@@ -11,6 +11,16 @@
     <!-- DataTables -->
     <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <style>
+        td.td-row {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+        }
+    </style>
 }
 
 <!-- Content Header (Page header) -->
@@ -37,12 +47,28 @@
 
             <div class="card">
                 <div class="card-header">
-                    <button title="Clear all events" class="btn btn-primary float-right ml-2" onclick="confirmClear()">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button title="Send unsent events to server" class="btn btn-primary float-right ml-2" onclick="confirmSendEvents()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <div class="dropdown">
+
+                        <button class="btn btn-primary dropdown-toggle float-right"
+                                type="button" id="btn-ops" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-list"></i> Operations
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="btn-ops">
+                            <button class="dropdown-item" onclick="confirmClear()">
+                                <i class="dropdown-item-icon fas fa-trash"></i> Clear all events
+                            </button>
+                            <button class="dropdown-item" onclick="confirmSendEvents()">
+                                <i class="dropdown-item-icon fas fa-paper-plane"></i> Send unsent events to server
+                            </button>
+                            <button class="dropdown-item" onclick="updateSeenStatus(false)">
+                                <i class="dropdown-item-icon fas fa-check"></i> Seen selected events
+                            </button>
+                            <button class="dropdown-item" onclick="updateSeenStatus(true)">
+                                <i class="dropdown-item-icon fas fa-check-double"></i> Seen all events
+                            </button>
+                        </div>
+
+                    </div>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -102,6 +128,11 @@
                 searching: true,
                 ordering: true,
                 searchDelay: 500,
+                createdRow: function (row, data, dataIndex) {
+                    if (!data.seen) {
+                        $(row).find('td').addClass('text-primary');
+                    }
+                },
                 ajax: {
                     url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API',
                     data: function (d) {
@@ -140,8 +171,13 @@
                     {
                         targets: 0,
                         data: "id",
+                        className: 'td-row',
                         render: function (data, type, row, meta) {
                             var btn =
+                                '<div class="form-check icheck-primary d-inline">' +
+                                    '<input class="cb-event" type="checkbox" value="' + data + '" id="cb-event-' + data + '">' +
+                                    '<label for="cb-event-' + data + '"></label>' +
+                                '</div>' +
                                 "<div class=\"dropdown\">" +
                                     "<button class=\"btn btn-primary dropdown-toggle btn-sm\"" +
                                         "type=\"button\" id=\"btn-dropdown\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
@@ -243,6 +279,32 @@
                 type: 'post',
                 success: (respData) => {
                     successAlert("Sent command successfully");
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function updateSeenStatus(isAll) {
+            let queryString = 'load_all=true';
+            if (!isAll) {
+                var checked = $('.cb-event:checked');
+                for (var i = 0; i < checked.length; i++) {
+                    var id = checked[i].value;
+                    queryString += '&ids=' + id;
+                }
+            }
+            changeLoading(true);
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API/seen-status?' + queryString,
+                type: 'put',
+                success: (data) => {
+                    successAlert("Seen " + data.data + " events")
+                        .then(reloadTable);
                 },
                 error: (resp) => {
                     handleGeneralError(resp);

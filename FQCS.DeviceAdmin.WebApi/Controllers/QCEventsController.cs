@@ -90,6 +90,23 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(updated));
         }
 
+
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
+        [HttpPut("seen-status")]
+        public IActionResult UpdateSeenStatus([FromQuery][QueryObject]QCEventQueryFilter filter,
+            [FromQuery]QCEventQuerySort sort,
+            [FromQuery]QCEventQueryPaging paging,
+            [FromQuery]QCEventQueryOptions options)
+        {
+            var validationData = _service.ValidateUpdateSeenStatus(
+                User, filter, sort, paging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var query = _service.GetQueryableQCEventForUpdate(options, filter, sort, paging);
+            var updated = _service.UpdateEventsSeenStatus(query, true);
+            return Ok(AppResult.Success(updated));
+        }
+
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
         [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpGet("images")]
@@ -138,8 +155,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(deleted));
         }
 
-        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
-        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
+        [Authorize(Roles = Data.Constants.RoleName.ADMIN + "," + Data.Constants.RoleName.DEVICE)]
         [HttpPost("")]
         public IActionResult Create(CreateQCEventModel model)
         {

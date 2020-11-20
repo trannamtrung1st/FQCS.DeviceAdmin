@@ -22,6 +22,7 @@ namespace FQCS.DeviceAdmin.Data.Models
         public string RightImage { get; set; }
         public string SideImages { get; set; }
         public bool NotiSent { get; set; }
+        public bool Seen { get; set; }
 
         public virtual IList<QCEventDetail> Details { get; set; }
     }

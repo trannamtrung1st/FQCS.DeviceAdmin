@@ -153,6 +153,7 @@ namespace FQCS.DeviceAdmin.Business.Models
     public class QCEventQueryFilter
     {
         public string id { get; set; }
+        public string[] ids { get; set; }
         public string defect_type { get; set; }
         public bool? sent { get; set; }
         [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
