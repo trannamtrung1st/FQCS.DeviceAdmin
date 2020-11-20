@@ -51,7 +51,7 @@
 
                         <button class="btn btn-primary dropdown-toggle float-right"
                                 type="button" id="btn-ops" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-list"></i> Operations
+                            <i class="fa fa-list"></i> &nbsp;&nbsp;Operations
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btn-ops">
                             <button class="dropdown-item" onclick="confirmClear()">
@@ -293,6 +293,8 @@
             let queryString = 'load_all=true';
             if (!isAll) {
                 var checked = $('.cb-event:checked');
+                if (!checked.length)
+                    return sorryAlert('No event selected');
                 for (var i = 0; i < checked.length; i++) {
                     var id = checked[i].value;
                     queryString += '&ids=' + id;
