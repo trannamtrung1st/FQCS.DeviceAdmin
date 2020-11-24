@@ -246,7 +246,7 @@ namespace FQCS.DeviceAdmin.Business.Services
             }
             var sideImages = entity.SideImages == null ? null :
                 JsonConvert.DeserializeObject<IEnumerable<string>>(entity.SideImages);
-            if (sideImages != null)
+            if (sideImages != null && sideImages.Count() > 0)
             {
                 sideImagesB64 = new List<string>();
                 foreach (var iPath in sideImages)
