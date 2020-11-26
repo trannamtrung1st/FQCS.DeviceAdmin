@@ -186,7 +186,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             if (Startup.KafkaProducer != null)
                 _service.ProduceEventToKafkaServer(Startup.KafkaProducer,
                     entity, Startup.CurrentConfig, Settings.Instance.QCEventImageFolderPath,
-                    Startup.ConnStr);
+                    Constants.Paths.STATE_PATH);
             return Created($"/{Business.Constants.ApiEndpoint.RESOURCE_API}?id={entity.Id}",
                 AppResult.Success(entity.Id));
         }
