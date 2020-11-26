@@ -47,6 +47,9 @@
 
             <div class="card">
                 <div class="card-header">
+                    <div class="float-left">
+                        Last event sync: <span id="lbl-last-event-time"></span>
+                    </div>
                     <div class="dropdown">
 
                         <button class="btn btn-primary dropdown-toggle float-right"
@@ -80,7 +83,6 @@
                                 <th>Id</th>
                                 <th class="sortable">Time</th>
                                 <th class="sortable">Defect type</th>
-                                <th class="sortable">Noti sent</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -92,7 +94,6 @@
                                 <th>Id</th>
                                 <th class="sortable">Time</th>
                                 <th class="sortable">Defect type</th>
-                                <th class="sortable">Noti sent</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -221,25 +222,35 @@
                             return defects.join(', ');
                         }
                     },
-                    {
-                        targets: 5,
-                        data: "noti_sent",
-                        orderable: true,
-                        render: function (data, type, row, meta) {
-                            return data ? "Yes" : "Not yet";
-                        }
-                    },
                     { targets: "_all", orderable: false, defaultContent: '' },
                 ],
                 order: [[3, 'desc']]
             });
             $('.select2').select2();
         });
+        getLastEventTime();
 
         function reloadTable() {
             tblMain.ajax.reload();
         }
 
+        function getLastEventTime() {
+            $.ajax({
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.QC_EVENT_API/last-event-time',
+                type: 'get',
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data;
+                    $('#lbl-last-event-time').html(data.display);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
 
         function confirmClear() {
             confirmAlert().then((result) => {

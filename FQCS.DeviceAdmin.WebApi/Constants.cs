@@ -7,6 +7,11 @@ namespace FQCS.DeviceAdmin.WebApi
 {
     public static class Constants
     {
+        public static class Paths
+        {
+            public const string STATE_PATH = "state.json";
+        }
+
         public static class Policy
         {
             public static class And

@@ -40,6 +40,8 @@ namespace FQCS.DeviceAdmin.WebApi
             Configuration = configuration;
             configuration.Bind("BusinessSettings", Business.Settings.Instance);
             configuration.Bind("WebApiSettings", WebApi.Settings.Instance);
+            var stateJson = File.ReadAllText(Constants.Paths.STATE_PATH);
+            JsonConvert.PopulateObject(stateJson, State.Instance);
         }
 
         public static FQCSScheduler Scheduler { get; private set; }
@@ -262,7 +264,6 @@ namespace FQCS.DeviceAdmin.WebApi
         {
             var oldConfig = CurrentConfig;
             CurrentConfig = config;
-            QCEvent.CheckedEvents.Clear();
             try
             {
                 if (CurrentConfig != null && !string.IsNullOrWhiteSpace(CurrentConfig.KafkaServer))
@@ -285,7 +286,7 @@ namespace FQCS.DeviceAdmin.WebApi
                     Scheduler.UnscheduleSendUnsentEventsJob()).Wait();
                 return;
             }
-            Scheduler.ConnStr = Startup.ConnStr;
+            Scheduler.StatePath = Constants.Paths.STATE_PATH;
             Scheduler.CurrentConfig = CurrentConfig;
             Scheduler.KafkaProducer = KafkaProducer;
             Scheduler.QCEventImageFolderPath = Settings.Instance.QCEventImageFolderPath;

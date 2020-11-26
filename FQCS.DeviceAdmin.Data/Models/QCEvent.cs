@@ -13,15 +13,12 @@ namespace FQCS.DeviceAdmin.Data.Models
         }
 
         // cache
-        public static ISet<string> CheckedEvents { get; } = new HashSet<string>();
-
         public string Id { get; set; }
         public DateTime LastUpdated { get; set; }
         public DateTime CreatedTime { get; set; }
         public string LeftImage { get; set; }
         public string RightImage { get; set; }
         public string SideImages { get; set; }
-        public bool NotiSent { get; set; }
         public bool Seen { get; set; }
 
         public virtual IList<QCEventDetail> Details { get; set; }

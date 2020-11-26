@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using FQCS.DeviceAdmin.Business;
 using FQCS.DeviceAdmin.Business.Models;
 using FQCS.DeviceAdmin.Business.Queries;
 using FQCS.DeviceAdmin.Business.Services;
@@ -28,15 +29,17 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             provider = scope.ServiceProvider;
             var dContext = provider.GetRequiredService<DataContext>();
             var qcEventService = provider.GetRequiredService<QCEventService>();
-            var entities = qcEventService.QCEvents.Include(o => o.Details).Unsent()
-                .ToList();
+            var query = qcEventService.QCEvents.Include(o => o.Details).AsQueryable();
+            if (State.Instance.LastEventTime != null)
+                query = query.FromTime(State.Instance.LastEventTime, true);
+            var entities = query.ToList();
             foreach (var entity in entities)
             {
-                if (scheduler.KafkaProducer != null && !QCEvent.CheckedEvents.Contains(entity.Id))
+                if (scheduler.KafkaProducer != null)
                 {
                     qcEventService.ProduceEventToKafkaServer(scheduler.KafkaProducer,
                         entity, scheduler.CurrentConfig, scheduler.QCEventImageFolderPath,
-                        scheduler.ConnStr);
+                        scheduler.StatePath);
                     if (settings.SleepSecs != null)
                         Thread.Sleep(settings.SleepSecs.Value * 1000);
                 }

@@ -66,6 +66,13 @@ namespace FQCS.DeviceAdmin.Business.Models
         public IEnumerable<CreateQCEventDetailModel> Details { get; set; }
     }
 
+    public class UpdateLastEventTimeModel
+    {
+        [JsonProperty("utc_time")]
+        public DateTime UtcTime { get; set; }
+    }
+
+
     public class CreateQCEventDetailModel : MappingModel<QCEventDetail>
     {
         public CreateQCEventDetailModel()
@@ -155,7 +162,7 @@ namespace FQCS.DeviceAdmin.Business.Models
         public string id { get; set; }
         public string[] ids { get; set; }
         public string defect_type { get; set; }
-        public bool? sent { get; set; }
+        public bool latest { get; set; }
         [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
         public DateTime? from_time { get; set; }
         [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]

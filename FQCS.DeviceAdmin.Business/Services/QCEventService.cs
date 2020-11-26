@@ -53,7 +53,6 @@ namespace FQCS.DeviceAdmin.Business.Services
                                 defect_type_code = o.DefectTypeCode,
                             }).ToList();
                             obj["details"] = details;
-                            obj["noti_sent"] = entity.NotiSent;
                             obj["seen"] = entity.Seen;
                             obj["left_image"] = entity.LeftImage;
                             obj["right_image"] = entity.RightImage;
@@ -227,8 +226,14 @@ namespace FQCS.DeviceAdmin.Business.Services
                 e.Id = Guid.NewGuid().ToString();
         }
 
+        public void SaveCurrentState(string path)
+        {
+            var stateJson = JsonConvert.SerializeObject(State.Instance);
+            File.WriteAllText(path, stateJson);
+        }
+
         public void ProduceEventToKafkaServer(IProducer<Null, string> producer, QCEvent entity,
-            DeviceConfig currentConfig, string dataFolder, string connStr)
+            DeviceConfig currentConfig, string dataFolder, string statePath)
         {
             var mess = new Message<Null, string>();
             string leftImgB64 = null; string rightImgB64 = null; List<string> sideImagesB64 = null;
@@ -277,18 +282,12 @@ namespace FQCS.DeviceAdmin.Business.Services
                 SideImages = entity.SideImages == null ? null :
                     JsonConvert.DeserializeObject<IList<string>>(entity.SideImages)
             });
-            QCEvent.CheckedEvents.Add(entity.Id);
             producer.Produce(Kafka.Constants.KafkaTopic.TOPIC_QC_EVENT, mess, report =>
             {
                 if (report.Status == PersistenceStatus.Persisted)
                 {
-                    using var context = new DataContext(
-                        new DbContextOptionsBuilder<DataContext>().UseSqlServer(connStr).Options);
-                    entity = context.QCEvent.Id(entity.Id).First();
-                    entity.NotiSent = true;
-                    entity.LastUpdated = DateTime.UtcNow;
-                    context.SaveChanges();
-                    QCEvent.CheckedEvents.Remove(entity.Id);
+                    State.Instance.LastEventTime = entity.CreatedTime;
+                    SaveCurrentState(statePath);
                 }
             });
         }
@@ -321,16 +320,6 @@ namespace FQCS.DeviceAdmin.Business.Services
                 nameof(QCEvent.Seen), nameof(QCEvent.LastUpdated) });
         }
 
-        public int UpdateEventsSentStatus(IQueryable<QCEvent> entities, bool val)
-        {
-            var updated = new QCEvent
-            {
-                NotiSent = val
-            };
-            PrepareUpdate(updated);
-            return entities.BatchUpdate(updated, new List<string> {
-                nameof(QCEvent.NotiSent), nameof(QCEvent.LastUpdated) });
-        }
         #endregion
 
         #region Delete QCEvent
@@ -376,12 +365,9 @@ namespace FQCS.DeviceAdmin.Business.Services
             return new ValidationData();
         }
 
-        public ValidationData ValidateUpdateSentStatus(
+        public ValidationData ValidateUpdateLastEventTime(
             ClaimsPrincipal principal,
-            QCEventQueryFilter filter,
-            QCEventQuerySort sort,
-            QCEventQueryPaging paging,
-            QCEventQueryOptions options)
+            UpdateLastEventTimeModel model)
         {
             return new ValidationData();
         }
@@ -396,6 +382,11 @@ namespace FQCS.DeviceAdmin.Business.Services
             return new ValidationData();
         }
 
+        public ValidationData ValidateGetLastEventTime(
+            ClaimsPrincipal principal)
+        {
+            return new ValidationData();
+        }
 
         public ValidationData ValidateGetQCEvents(
             ClaimsPrincipal principal,

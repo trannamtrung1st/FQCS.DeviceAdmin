@@ -56,6 +56,29 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
         [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
+        [HttpGet("last-event-time")]
+        public IActionResult GetLastEventTime()
+        {
+            var validationData = _service.ValidateGetLastEventTime(User);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            if (State.Instance.LastEventTime == null)
+                return Ok(AppResult.Success());
+            var time = State.Instance.LastEventTime.Value
+                                .ToDefaultTimeZone();
+            string defaultDf = null;
+            var timeStr = time.ToString(defaultDf);
+            var apiDateTime = new
+            {
+                display = timeStr,
+                iso = $"{time.ToUniversalTime():s}Z"
+            };
+            return Ok(AppResult.Success(apiDateTime));
+        }
+
+
+        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
         [HttpGet("count")]
         public IActionResult Count([FromQuery][QueryObject]QCEventQueryFilter filter,
             [FromQuery]QCEventQuerySort sort,
@@ -71,25 +94,19 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(count));
         }
 
-        [Authorize(Policy = Constants.Policy.And.APP_CLIENT)]
-        [HttpPut("sent-status")]
-        public IActionResult UpdateSentStatus([FromQuery][QueryObject]QCEventQueryFilter filter,
-            [FromQuery]QCEventQuerySort sort,
-            [FromQuery]QCEventQueryPaging paging,
-            [FromQuery]QCEventQueryOptions options)
+        [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]
+        [Authorize(Policy = Constants.Policy.Or.ADMIN_USER)]
+        [HttpPut("last-event-time")]
+        public IActionResult UpdateLastEventTime(UpdateLastEventTimeModel model)
         {
-            var validationData = _service.ValidateUpdateSentStatus(
-                User, filter, sort, paging, options);
+            var validationData = _service.ValidateUpdateLastEventTime(
+                User, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var query = _service.GetQueryableQCEventForUpdate(options, filter, sort, paging);
-            var updatedIds = query.Select(o => o.Id).ToList();
-            var updated = _service.UpdateEventsSentStatus(query, true);
-            foreach (var id in updatedIds)
-                QCEvent.CheckedEvents.Remove(id);
-            return Ok(AppResult.Success(updated));
+            State.Instance.LastEventTime = model.UtcTime;
+            _service.SaveCurrentState(Constants.Paths.STATE_PATH);
+            return NoContent();
         }
-
 
         [Authorize(Roles = Data.Constants.RoleName.ADMIN)]
         [HttpPut("seen-status")]

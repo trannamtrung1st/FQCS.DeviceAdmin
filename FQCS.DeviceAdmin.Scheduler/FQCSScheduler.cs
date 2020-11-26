@@ -18,7 +18,7 @@ namespace FQCS.DeviceAdmin.Scheduler
         public DeviceConfig CurrentConfig { get; set; }
         public IProducer<Null, string> KafkaProducer { get; set; }
         public string QCEventImageFolderPath { get; set; }
-        public string ConnStr { get; set; }
+        public string StatePath { get; set; }
 
         public RemoveOldEventsJobSettings RemoveOldEventsJobSettings { get; }
         public SendUnsentEventsJobSettings SendUnsentEventsJobSettings { get; }

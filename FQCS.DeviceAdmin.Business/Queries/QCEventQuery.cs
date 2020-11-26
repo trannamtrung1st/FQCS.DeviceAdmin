@@ -17,11 +17,6 @@ namespace FQCS.DeviceAdmin.Business.Queries
             return query.Where(o => o.CreatedTime.Date < lastKeepDate);
         }
 
-        public static IQueryable<QCEvent> Unsent(this IQueryable<QCEvent> query)
-        {
-            return query.Where(o => o.NotiSent == false);
-        }
-
         public static IQueryable<QCEvent> Id(this IQueryable<QCEvent> query, string id)
         {
             return query.Where(o => o.Id == id);
@@ -63,6 +58,24 @@ namespace FQCS.DeviceAdmin.Business.Queries
             return query;
         }
 
+        public static IQueryable<QCEvent> FromTime(this IQueryable<QCEvent> query, DateTime? time, bool excl = false)
+        {
+            if (excl)
+                query = query.Where(o => o.CreatedTime > time);
+            else
+                query = query.Where(o => o.CreatedTime >= time);
+            return query;
+        }
+
+        public static IQueryable<QCEvent> ToTime(this IQueryable<QCEvent> query, DateTime? time, bool excl = false)
+        {
+            if (excl)
+                query = query.Where(o => o.CreatedTime < time);
+            else
+                query = query.Where(o => o.CreatedTime <= time);
+            return query;
+        }
+
         public static IQueryable<QCEvent> Filter(
             this IQueryable<QCEvent> query, QCEventQueryFilter filter)
         {
@@ -73,13 +86,13 @@ namespace FQCS.DeviceAdmin.Business.Queries
             if (filter.defect_type != null)
                 query = query.Where(o => o.Details.Any(e => e.DefectTypeCode == filter.defect_type));
             if (filter.from_time != null)
-                query = query.Where(o => o.CreatedTime >= filter.from_time);
+                query = query.FromTime(filter.from_time);
             if (filter.to_time != null)
-                query = query.Where(o => o.CreatedTime <= filter.to_time);
-            if (filter.sent != null)
-                query = query.Where(o => o.NotiSent == filter.sent);
+                query = query.ToTime(filter.to_time);
             if (filter.seen != null)
                 query = query.Where(o => o.Seen == filter.seen);
+            if (filter.latest && State.Instance.LastEventTime != null)
+                query = query.FromTime(State.Instance.LastEventTime, true);
             return query;
         }
 
