@@ -160,6 +160,7 @@ namespace FQCS.DeviceAdmin.Business.Models
         public DateTime? from_time { get; set; }
         [DefaultDateTimeModelBinder(DateFormat = Constants.AppDateTimeFormat.LOCAL_TIME)]
         public DateTime? to_time { get; set; }
+        public bool? seen { get; set; }
     }
 
     public class QCEventQueryPaging

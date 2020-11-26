@@ -290,7 +290,7 @@
         }
 
         function updateSeenStatus(isAll) {
-            let queryString = 'load_all=true';
+            let queryString = 'load_all=true&seen=false';
             if (!isAll) {
                 var checked = $('.cb-event:checked');
                 if (!checked.length)
