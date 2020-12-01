@@ -148,11 +148,11 @@
             let html = '';
             let json = resp.responseJSON;
             if (json.code == @((int)Business.Constants.AppResultCode.FailValidation)) {
-                html = 'Some inputs are not valid';
-                let data = json.data;
+                html = '';
+                let data = json.data.results;
                 for (var i = 0; i < data.length; i++) {
                     var result = data[i];
-                    console.log(result);
+                    html += result.message + '<br/>';
                 }
             } else if (badReqMessage)
                 html += badReqMessage(json);
