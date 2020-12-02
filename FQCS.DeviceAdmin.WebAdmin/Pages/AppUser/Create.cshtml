@@ -98,9 +98,13 @@
                 rules: {
                     username: {
                         required: true,
+                        minlength: 5,
+                        maxlength: 30,
                     },
                     password: {
                         required: true,
+                        minlength: 6,
+                        maxlength: 30,
                     },
                     role: {
                         required: true,
@@ -109,6 +113,12 @@
                 messages: {
                     username: {
                         required: "Username required",
+                        minlength: "Username must be longer than 5 characters",
+                        maxlength: "Username must be shorter than 30 characters",
+                    },
+                    password: {
+                        minlength: "Password must be longer than 6 characters",
+                        maxlength: "Password must be shorter than 30 characters",
                     },
                 },
                 errorElement: 'span',
