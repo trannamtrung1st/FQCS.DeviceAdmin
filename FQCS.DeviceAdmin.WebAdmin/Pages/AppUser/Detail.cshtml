@@ -100,10 +100,15 @@
                 submitHandler: confirmSubmit,
                 rules: {
                     password_reset: {
-                        min: 6
+                        minlength: 6,
+                        maxlength: 30,
                     }
                 },
                 messages: {
+                    password_reset: {
+                        minlength: "Password must be longer than 6 characters",
+                        maxlength: "Password must be shorter than 30 characters",
+                    },
                 },
                 errorElement: 'span',
                 errorPlacement: function (error, element) {

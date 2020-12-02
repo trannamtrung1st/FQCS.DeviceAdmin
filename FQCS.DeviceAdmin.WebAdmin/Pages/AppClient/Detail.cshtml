@@ -106,17 +106,21 @@
                 rules: {
                     client_name: {
                         required: true,
+                        maxlength: 255,
                     },
                     secret_key: {
                         required: true,
+                        maxlength: 255,
                     },
                 },
                 messages: {
                     client_name: {
                         required: "Client name required",
+                        maxlength: "Character limit is 255",
                     },
                     secret_key: {
                         required: "Client secret required",
+                        maxlength: "Character limit is 255",
                     },
                 },
                 errorElement: 'span',
