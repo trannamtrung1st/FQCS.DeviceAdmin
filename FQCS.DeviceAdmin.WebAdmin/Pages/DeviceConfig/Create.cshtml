@@ -153,6 +153,7 @@
                 rules: {
                     identifier: {
                         required: true,
+                        maxlength: 50,
                     },
                     roe_secs_interval: {
                         require_if: '[name=roe_enabled]:checked',
@@ -177,6 +178,7 @@
                 messages: {
                     identifier: {
                         required: "Identifier required",
+                        maxlength: "Identifier must be shorter than 50 characters",
                     },
                 },
                 errorElement: 'span',
