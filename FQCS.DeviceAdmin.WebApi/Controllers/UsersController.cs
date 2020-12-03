@@ -203,7 +203,6 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(data));
         }
 
-#if DEBUG
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm]RegisterModel model)
         {
@@ -217,7 +216,8 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 {
                     var entity = _service.ConvertToUser(model);
                     result = await _service
-                        .CreateUserWithRolesTransactionAsync(entity, model.password);
+                        .CreateUserWithRolesTransactionAsync(entity, model.password,
+                            new[] { Data.Constants.RoleName.ADMIN });
                     if (result.Succeeded)
                     {
                         trans.Commit();
@@ -232,6 +232,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return BadRequest(appResult);
         }
 
+#if DEBUG
         #region Administration
         [HttpPost("role")]
         public async Task<IActionResult> AddRole(AddRolesToUserModel model)
