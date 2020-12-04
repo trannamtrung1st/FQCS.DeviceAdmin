@@ -12,7 +12,23 @@ using FQCS.DeviceAdmin.Business.Helpers;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
-    public class AppClientService : Service
+    public interface IAppClientService
+    {
+        IQueryable<AppClient> AppClients { get; }
+
+        AppClient CreateAppClient(CreateAppClientModel model);
+        AppClient DeleteAppClient(AppClient entity);
+        IDictionary<string, object> GetAppClientDynamic(AppClient row, AppClientQueryProjection projection, AppClientQueryOptions options);
+        List<IDictionary<string, object>> GetAppClientDynamic(IEnumerable<AppClient> rows, AppClientQueryProjection projection, AppClientQueryOptions options);
+        Task<QueryResult<IDictionary<string, object>>> QueryAppClientDynamic(AppClientQueryProjection projection, AppClientQueryOptions options, AppClientQueryFilter filter = null, AppClientQuerySort sort = null, AppClientQueryPaging paging = null);
+        void UpdateAppClient(AppClient entity, UpdateAppClientModel model);
+        ValidationData ValidateCreateAppClient(ClaimsPrincipal principal, CreateAppClientModel model);
+        ValidationData ValidateDeleteAppClient(ClaimsPrincipal principal, AppClient entity);
+        ValidationData ValidateGetAppClients(ClaimsPrincipal principal, AppClientQueryFilter filter, AppClientQuerySort sort, AppClientQueryProjection projection, AppClientQueryPaging paging, AppClientQueryOptions options);
+        ValidationData ValidateUpdateAppClient(ClaimsPrincipal principal, AppClient entity, UpdateAppClientModel model);
+    }
+
+    public class AppClientService : Service, IAppClientService
     {
         public AppClientService(ServiceInjection inj) : base(inj)
         {

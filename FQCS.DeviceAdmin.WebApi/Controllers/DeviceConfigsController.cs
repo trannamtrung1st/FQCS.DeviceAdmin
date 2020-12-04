@@ -23,7 +23,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     public class DeviceConfigsController : BaseController
     {
         [Inject]
-        private readonly DeviceConfigService _service;
+        private readonly IDeviceConfigService _service;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize]

@@ -26,7 +26,7 @@ namespace FQCS.DeviceAdmin.WebAdmin.Pages.Identity
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         [Inject]
-        protected readonly IdentityService identityService;
+        protected readonly IIdentityService identityService;
         public string Message { get; set; } = null;
         public string MessageTitle { get; set; } = null;
         public string Layout { get; set; } = null;

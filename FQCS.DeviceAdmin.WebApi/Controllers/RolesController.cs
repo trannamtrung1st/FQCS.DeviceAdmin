@@ -21,7 +21,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     public class RolesController : BaseController
     {
         [Inject]
-        private readonly IdentityService _service;
+        private readonly IIdentityService _service;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [HttpGet("")]

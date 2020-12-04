@@ -50,7 +50,7 @@ namespace FQCS.DeviceAdmin.Business
                 .SelectMany(t => t.GetTypes())
                 .Where(t => baseServiceType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
             foreach (var t in serviceTypes)
-                services.AddScoped(t);
+                services.AddScoped(t.GetInterfaces()[0], t);
         }
 
         public static void Init(IServiceCollection services)

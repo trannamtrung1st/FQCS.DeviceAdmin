@@ -13,7 +13,25 @@ using Newtonsoft.Json;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
-    public class DeviceConfigService : Service
+    public interface IDeviceConfigService
+    {
+        IQueryable<DeviceConfig> DeviceConfigs { get; }
+
+        DeviceConfig ChangeCurrentDeviceConfig(DeviceConfig entity, DeviceConfig oldCurrent);
+        DeviceConfig CreateDeviceConfig(CreateDeviceConfigModel model);
+        DeviceConfig DeleteDeviceConfig(DeviceConfig entity);
+        IDictionary<string, object> GetDeviceConfigDynamic(DeviceConfig row, DeviceConfigQueryProjection projection, DeviceConfigQueryOptions options);
+        List<IDictionary<string, object>> GetDeviceConfigDynamic(IEnumerable<DeviceConfig> rows, DeviceConfigQueryProjection projection, DeviceConfigQueryOptions options);
+        Task<QueryResult<IDictionary<string, object>>> QueryDeviceConfigDynamic(DeviceConfigQueryProjection projection, DeviceConfigQueryOptions options, DeviceConfigQueryFilter filter = null, DeviceConfigQuerySort sort = null, DeviceConfigQueryPaging paging = null);
+        void UpdateDeviceConfig(DeviceConfig entity, UpdateDeviceConfigModel model);
+        ValidationData ValidateChangeCurrentDeviceConfig(ClaimsPrincipal principal, DeviceConfig entity, ChangeCurrentDeviceConfigModel model);
+        ValidationData ValidateCreateDeviceConfig(ClaimsPrincipal principal, CreateDeviceConfigModel model);
+        ValidationData ValidateDeleteDeviceConfig(ClaimsPrincipal principal, DeviceConfig entity);
+        ValidationData ValidateGetDeviceConfigs(ClaimsPrincipal principal, DeviceConfigQueryFilter filter, DeviceConfigQuerySort sort, DeviceConfigQueryProjection projection, DeviceConfigQueryPaging paging, DeviceConfigQueryOptions options);
+        ValidationData ValidateUpdateDeviceConfig(ClaimsPrincipal principal, DeviceConfig entity, UpdateDeviceConfigModel model);
+    }
+
+    public class DeviceConfigService : Service, IDeviceConfigService
     {
 
         public DeviceConfigService(ServiceInjection inj) : base(inj)

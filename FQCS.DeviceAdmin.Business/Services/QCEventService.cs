@@ -19,7 +19,36 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
-    public class QCEventService : Service
+    public interface IQCEventService
+    {
+        IQueryable<QCEvent> QCEvents { get; }
+
+        void ClearAllQCEventImages(string dataFolder);
+        Task<int> ClearAllQCEvents();
+        QCEvent CreateQCEvent(CreateQCEventModel model, DateTime createdTime);
+        QCEvent DeleteQCEvent(QCEvent entity);
+        int DeleteQCEvents(IQueryable<QCEvent> entities);
+        List<IDictionary<string, object>> GetQCEventDynamic(IEnumerable<QCEvent> rows, QCEventQueryProjection projection, QCEventQueryOptions options, string folderPath, IFileService fileService);
+        IDictionary<string, object> GetQCEventDynamic(QCEvent row, QCEventQueryProjection projection, QCEventQueryOptions options, string folderPath, IFileService fileService);
+        IQueryable<QCEvent> GetQueryableQCEvent(QCEventQueryOptions options, QCEventQueryFilter filter = null, QCEventQuerySort sort = null, QCEventQueryPaging paging = null);
+        IQueryable<QCEvent> GetQueryableQCEventForUpdate(QCEventQueryOptions options, QCEventQueryFilter filter = null, QCEventQuerySort sort = null, QCEventQueryPaging paging = null);
+        void ProduceEventToKafkaServer(IProducer<Null, string> producer, QCEvent entity, DeviceConfig currentConfig, string dataFolder, string statePath);
+        Task<QueryResult<IDictionary<string, object>>> QueryQCEventDynamic(QCEventQueryProjection projection, QCEventQueryOptions options, QCEventQueryFilter filter = null, QCEventQuerySort sort = null, QCEventQueryPaging paging = null, string folderPath = null);
+        void SaveCurrentState(string path);
+        int UpdateEventsSeenStatus(IQueryable<QCEvent> entities, bool val);
+        ValidationData ValidateClearAllEvents(ClaimsPrincipal principal);
+        ValidationData ValidateCountQCEvents(ClaimsPrincipal principal, QCEventQueryFilter filter, QCEventQuerySort sort, QCEventQueryPaging paging, QCEventQueryOptions options);
+        ValidationData ValidateCreateQCEvent(ClaimsPrincipal principal, CreateQCEventModel model);
+        ValidationData ValidateDeleteQCEvent(ClaimsPrincipal principal, QCEvent entity);
+        ValidationData ValidateGetAllImages(ClaimsPrincipal principal);
+        ValidationData ValidateGetLastEventTime(ClaimsPrincipal principal);
+        ValidationData ValidateGetQCEvents(ClaimsPrincipal principal, QCEventQueryFilter filter, QCEventQuerySort sort, QCEventQueryProjection projection, QCEventQueryPaging paging, QCEventQueryOptions options);
+        ValidationData ValidateSendEvents(ClaimsPrincipal principal);
+        ValidationData ValidateUpdateLastEventTime(ClaimsPrincipal principal, UpdateLastEventTimeModel model);
+        ValidationData ValidateUpdateSeenStatus(ClaimsPrincipal principal, QCEventQueryFilter filter, QCEventQuerySort sort, QCEventQueryPaging paging, QCEventQueryOptions options);
+    }
+
+    public class QCEventService : Service, IQCEventService
     {
         public QCEventService(ServiceInjection inj) : base(inj)
         {
@@ -36,7 +65,7 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public IDictionary<string, object> GetQCEventDynamic(
             QCEvent row, QCEventQueryProjection projection,
-            QCEventQueryOptions options, string folderPath, FileService fileService)
+            QCEventQueryOptions options, string folderPath, IFileService fileService)
         {
             var obj = new Dictionary<string, object>();
             foreach (var f in projection.GetFieldsArr())
@@ -126,7 +155,7 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public List<IDictionary<string, object>> GetQCEventDynamic(
             IEnumerable<QCEvent> rows, QCEventQueryProjection projection,
-            QCEventQueryOptions options, string folderPath, FileService fileService)
+            QCEventQueryOptions options, string folderPath, IFileService fileService)
         {
             var list = new List<IDictionary<string, object>>();
             foreach (var o in rows)
@@ -145,7 +174,7 @@ namespace FQCS.DeviceAdmin.Business.Services
             QCEventQueryPaging paging = null,
             string folderPath = null)
         {
-            var fileService = provider.GetRequiredService<FileService>();
+            var fileService = provider.GetRequiredService<IFileService>();
             var query = QCEvents;
             #region General
             if (filter != null) query = query.Filter(filter);
@@ -330,7 +359,7 @@ namespace FQCS.DeviceAdmin.Business.Services
 
         public void ClearAllQCEventImages(string dataFolder)
         {
-            var fileService = provider.GetRequiredService<FileService>();
+            var fileService = provider.GetRequiredService<IFileService>();
             fileService.DeleteDirectory(dataFolder, "");
             Directory.CreateDirectory(dataFolder);
         }

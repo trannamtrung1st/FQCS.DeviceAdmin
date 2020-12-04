@@ -11,7 +11,23 @@ using TNT.Core.Helpers.DI;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
-    public class ResourceService : Service
+    public interface IResourceService
+    {
+        IQueryable<Resource> Resources { get; }
+
+        Resource CreateResource(CreateResourceModel model);
+        Resource DeleteResource(Resource entity);
+        List<IDictionary<string, object>> GetResourceDynamic(IEnumerable<Resource> rows, ResourceQueryProjection projection, ResourceQueryOptions options);
+        IDictionary<string, object> GetResourceDynamic(Resource row, ResourceQueryProjection projection, ResourceQueryOptions options);
+        Task<QueryResult<IDictionary<string, object>>> QueryResourceDynamic(ResourceQueryProjection projection, ResourceQueryOptions options, ResourceQueryFilter filter = null, ResourceQuerySort sort = null, ResourceQueryPaging paging = null);
+        void UpdateResource(Resource entity, UpdateResourceModel model);
+        ValidationData ValidateCreateResource(ClaimsPrincipal principal, CreateResourceModel model);
+        ValidationData ValidateDeleteResource(ClaimsPrincipal principal, Resource entity);
+        ValidationData ValidateGetResources(ClaimsPrincipal principal, ResourceQueryFilter filter, ResourceQuerySort sort, ResourceQueryProjection projection, ResourceQueryPaging paging, ResourceQueryOptions options);
+        ValidationData ValidateUpdateResource(ClaimsPrincipal principal, Resource entity, UpdateResourceModel model);
+    }
+
+    public class ResourceService : Service, IResourceService
     {
         public ResourceService(ServiceInjection inj) : base(inj)
         {

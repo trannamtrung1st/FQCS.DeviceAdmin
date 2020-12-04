@@ -28,7 +28,7 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             using var scope = provider.CreateScope();
             provider = scope.ServiceProvider;
             var dContext = provider.GetRequiredService<DataContext>();
-            var qcEventService = provider.GetRequiredService<QCEventService>();
+            var qcEventService = provider.GetRequiredService<IQCEventService>();
             var query = qcEventService.QCEvents.Include(o => o.Details).AsQueryable();
             if (State.Instance.LastEventTime != null)
                 query = query.FromTime(State.Instance.LastEventTime, true);

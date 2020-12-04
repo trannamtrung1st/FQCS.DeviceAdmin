@@ -19,8 +19,66 @@ using static FQCS.DeviceAdmin.Business.Constants;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
+    public interface IIdentityService
+    {
+        IQueryable<AppRole> Roles { get; }
+        IQueryable<AppUser> Users { get; }
 
-    public class IdentityService : Service
+        Task<IdentityResult> AddLoginToUserAsync(AppUser entity, ExternalLoginInfo info);
+        Task<IdentityResult> AddRolesForUserAsync(AppUser entity, IEnumerable<string> roles);
+        Task<AppUser> AuthenticateAsync(string username, string password);
+        Task<AppUser> AuthenticateExternalAsync(string provider, string providerKey);
+        string ComputeHash(string dateTimeStr, string dateFormat, string secret);
+        AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl, string userId = null);
+        AppUser ConvertToUser(CreateAppUserModel model);
+        AppUser ConvertToUser(RegisterModel model);
+        AppUser CreateAppUser(CreateAppUserModel model);
+        Task<IdentityResult> CreateRoleAsync(CreateRoleModel model);
+        Task<IdentityResult> CreateUserAsync(AppUser entity, string password);
+        Task<IdentityResult> CreateUserWithRolesTransactionAsync(AppUser entity, string password, IEnumerable<string> roles = null);
+        AppUser DeleteAppUser(AppUser entity);
+        Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey, bool isPersistent, bool bypassTwoFactor);
+        string[] ExtractInfoFromClientAuthHeader(string authHeader);
+        TokenResponseModel GenerateTokenResponse(ClaimsPrincipal principal, AuthenticationProperties properties, string scope = null);
+        Task<ClaimsPrincipal> GetApplicationPrincipalAsync(AppUser entity);
+        IDictionary<string, object> GetAppUserDynamic(AppUser row, AppUserQueryProjection projection, AppUserQueryOptions options);
+        List<IDictionary<string, object>> GetAppUserDynamic(IEnumerable<AppUser> rows, AppUserQueryProjection projection, AppUserQueryOptions options);
+        Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null);
+        List<Claim> GetExtraClaims(AppUser entity);
+        Task<ClaimsIdentity> GetIdentityAsync(AppUser entity, string scheme);
+        AppRole GetRoleByName(string name);
+        Task<AppUser> GetUserByIdAsync(string id);
+        Task<AppUser> GetUserByUserNameAsync(string username);
+        object GetUserProfile(AppUser entity);
+        bool IsValidAppClientScheme(string authHeader);
+        Task<SignInResult> PasswordSignInAsync(string username, string password, bool isPersistent, bool lockoutOnFailure);
+        void PrepareUpdate(AppUser entity);
+        Task<QueryResult<IDictionary<string, object>>> QueryAppUserDynamic(AppUserQueryProjection projection, AppUserQueryOptions options, AppUserQueryFilter filter = null, AppUserQuerySort sort = null, AppUserQueryPaging paging = null);
+        Task<IdentityResult> RemoveRoleAsync(AppRole entity);
+        Task<IdentityResult> RemoveUserFromRolesAsync(AppUser entity, IEnumerable<string> roles);
+        Task SignInAsync(AppUser user, AuthenticationProperties props);
+        Task SignInWithExtraClaimsAsync(AppUser entity, bool isPersistent);
+        Task SignOutAsync();
+        void UpdateAppUser(AppUser entity, UpdateAppUserModel model);
+        Task<IdentityResult> UpdatePasswordIfAvailable(AppUser entity, UpdateAppUserModel model);
+        Task<IdentityResult> UpdateRoleAsync(AppRole entity, UpdateRoleModel model);
+        Task<IdentityResult> UpdateUserAsync(AppUser entity);
+        ValidationData ValidateClientRequest(string dateTimeStr, string dateFormat, string hashed, AppClient client);
+        ValidationData ValidateCreateAppUser(ClaimsPrincipal principal, CreateAppUserModel model);
+        ValidationData ValidateCreateRole(ClaimsPrincipal principal, CreateRoleModel model);
+        ValidationData ValidateDeleteAppUser(ClaimsPrincipal principal, AppUser entity);
+        ValidationData ValidateDeleteRole(ClaimsPrincipal principal, AppRole entity);
+        ValidationData ValidateGetAppUsers(ClaimsPrincipal principal, AppUserQueryFilter filter, AppUserQuerySort sort, AppUserQueryProjection projection, AppUserQueryPaging paging, AppUserQueryOptions options);
+        ValidationData ValidateGetProfile(ClaimsPrincipal principal);
+        ValidationData ValidateGetRoles(ClaimsPrincipal principal);
+        ValidationData ValidateLogin(ClaimsPrincipal principal, AuthorizationGrantModel model);
+        ClaimsPrincipal ValidateRefreshToken(string tokenStr);
+        ValidationData ValidateRegister(ClaimsPrincipal principal, RegisterModel model);
+        ValidationData ValidateUpdateAppUser(ClaimsPrincipal principal, AppUser entity, UpdateAppUserModel model);
+        ValidationData ValidateUpdateRole(ClaimsPrincipal principal, UpdateRoleModel model);
+    }
+
+    public class IdentityService : Service, IIdentityService
     {
         [Inject]
         private readonly UserManager<AppUser> _userManager;

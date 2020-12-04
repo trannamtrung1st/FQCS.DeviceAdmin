@@ -15,9 +15,9 @@ namespace FQCS.DeviceAdmin.WebApi.Policies
     public class AppClientAuthHandler : BaseAuthHandler<AppClientRequirement>
     {
         [Inject]
-        protected readonly IdentityService identityService;
+        protected readonly IIdentityService identityService;
         [Inject]
-        protected readonly AppClientService appClientService;
+        protected readonly IAppClientService appClientService;
         [Inject]
         private readonly IHttpContextAccessor _httpContextAccessor;
 

@@ -28,9 +28,9 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     public class QCEventsController : BaseController
     {
         [Inject]
-        private readonly QCEventService _service;
+        private readonly IQCEventService _service;
         [Inject]
-        private readonly FileService _fileService;
+        private readonly IFileService _fileService;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize(Policy = Constants.Policy.Or.APP_CLIENT)]

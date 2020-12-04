@@ -23,9 +23,9 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     public class AppClientsController : BaseController
     {
         [Inject]
-        private readonly AppClientService _service;
+        private readonly IAppClientService _service;
         [Inject]
-        private readonly IdentityService _identityService;
+        private readonly IIdentityService _identityService;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize(Roles = Data.Constants.RoleName.ADMIN)]

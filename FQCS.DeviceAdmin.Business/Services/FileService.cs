@@ -16,7 +16,18 @@ using System.IO.Compression;
 
 namespace FQCS.DeviceAdmin.Business.Services
 {
-    public class FileService : Service
+    public interface IFileService
+    {
+        void DeleteDirectory(string folderPath, string rootPath, bool recursive = true);
+        void DeleteFile(string filePath, string rootPath);
+        (string, string) GetFilePath(string folderPath, string rootPath = null, string fileName = null, string ext = null);
+        string GetLocalTempFilePath(string ext = null);
+        Task SaveFile(byte[] file, string fullPath);
+        Task SaveFile(IFormFile file, string fullPath);
+        void ZipFolderToDir(string folderPath, string destPath);
+    }
+
+    public class FileService : Service, IFileService
     {
         public FileService(ServiceInjection inj) : base(inj)
         {

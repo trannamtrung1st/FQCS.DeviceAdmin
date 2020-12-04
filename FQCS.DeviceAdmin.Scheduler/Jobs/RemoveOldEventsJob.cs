@@ -24,7 +24,7 @@ namespace FQCS.DeviceAdmin.Scheduler.Jobs
             using var scope = provider.CreateScope();
             provider = scope.ServiceProvider;
             var dContext = provider.GetRequiredService<DataContext>();
-            var qcEventService = provider.GetRequiredService<QCEventService>();
+            var qcEventService = provider.GetRequiredService<IQCEventService>();
             var entities = qcEventService.QCEvents.ExceptLast(settings.KeepDays.Value);
             var removed = qcEventService.DeleteQCEvents(entities);
             Console.WriteLine($"Removed: {removed}");

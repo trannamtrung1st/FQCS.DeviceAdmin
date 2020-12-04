@@ -23,7 +23,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
     public class ResourcesController : BaseController
     {
         [Inject]
-        private readonly ResourceService _service;
+        private readonly IResourceService _service;
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Authorize]
