@@ -1,5 +1,4 @@
-﻿#if DEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -39,6 +38,7 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
             return Ok(AppResult.Success(result));
         }
 
+#if DEBUG
         [HttpPost("")]
         public async Task<IActionResult> CreateRole(CreateRoleModel model)
         {
@@ -86,6 +86,6 @@ namespace FQCS.DeviceAdmin.WebApi.Controllers
                 ModelState.AddModelError(err.Code, err.Description);
             return BadRequest(AppResult.FailValidation(ModelState));
         }
+#endif
     }
 }
-#endif
