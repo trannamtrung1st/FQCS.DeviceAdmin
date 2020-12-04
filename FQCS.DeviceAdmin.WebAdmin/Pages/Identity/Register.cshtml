@@ -167,7 +167,7 @@
             var formData = new FormData(form);
             changeLoading(true);
             $.ajax({
-                url: '@apiUrl/@Business.Constants.ApiEndpoint.USER_API',
+                url: '@apiUrl/@Business.Constants.ApiEndpoint.USER_API/register',
                 type: 'post',
                 contentType: false,
                 processData: false,
