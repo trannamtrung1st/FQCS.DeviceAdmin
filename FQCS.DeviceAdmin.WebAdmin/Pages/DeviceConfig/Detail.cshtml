@@ -233,12 +233,14 @@
             const sue_data = JSON.parse(data.send_unsent_events_job_settings);
             const roe = formMain.find('#roe-section');
             roe.find('[name=roe_enabled]').prop('checked', roe_data.enabled);
-            roe.find('[name=roe_secs_interval]').val(roe_data.secs_interval / 3600.0);
+            if (roe_data.secs_interval / 3600.0)
+                roe.find('[name=roe_secs_interval]').val(roe_data.secs_interval / 3600.0);
             roe.find('[name=roe_keep_days]').val(roe_data.keep_days);
             roe.find('[name=next_roe_job_start]').val(data.next_roe_job_start?.display);
             const sue = formMain.find('#sue-section');
             sue.find('[name=sue_enabled]').prop('checked', sue_data.enabled);
-            sue.find('[name=sue_secs_interval]').val(sue_data.secs_interval / 3600.0);
+            if (sue_data.secs_interval / 3600.0)
+                sue.find('[name=sue_secs_interval]').val(sue_data.secs_interval / 3600.0);
             sue.find('[name=sue_sleep_secs]').val(sue_data.sleep_secs);
             sue.find('[name=next_sue_job_start]').val(data.next_sue_job_start?.display);
         }
